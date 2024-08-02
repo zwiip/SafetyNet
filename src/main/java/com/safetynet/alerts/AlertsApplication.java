@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.safetynet.alerts.repository.DataRepository;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
-@SpringBootApplication
+@SpringBootApplication(exclude={DataSourceAutoConfiguration.class})
 public class AlertsApplication implements CommandLineRunner {
 
 	public static void main(String[] args) {
