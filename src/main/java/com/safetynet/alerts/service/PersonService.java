@@ -1,4 +1,4 @@
-package com.safetynet.alerts.service;
+/*package com.safetynet.alerts.service;
 
 import lombok.Data;
 import org.springframework.stereotype.Service;
@@ -14,3 +14,4 @@ public class PersonService {
     }
 
 }
+;*/
