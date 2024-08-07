@@ -1,5 +1,8 @@
 package com.safetynet.alerts;
 
+import com.safetynet.alerts.controller.PersonController;
+import com.safetynet.alerts.repository.PersonRepository;
+import com.safetynet.alerts.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,10 +20,15 @@ public class AlertsApplication implements CommandLineRunner {
 
 	@Autowired
 	private DataRepository dataRepository;
+	@Autowired
+	private PersonRepository personRepository;
+
+	@Autowired
+	PersonController personController;
 
 	@Override
 	public void run(String... args) throws Exception {
-		dataRepository.getData();
-
+		personRepository.createListPersons(dataRepository.getData());
+		System.out.println(personController.getPersons());
 	}
 }

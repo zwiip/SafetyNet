@@ -1,17 +1,19 @@
-/*package com.safetynet.alerts.service;
+package com.safetynet.alerts.service;
 
-import lombok.Data;
+import com.safetynet.alerts.model.Person;
+import com.safetynet.alerts.repository.PersonRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.List;
 
-@Data
 @Service
 public class PersonService {
+    @Autowired
+    private PersonRepository personRepository;
 
-    public Object getPersons(Map<String, Object> data) {
-        return data.get("persons");
+    public List<Person> findAll() {
+        return persons;
     }
 
 }
-;*/
