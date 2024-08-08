@@ -16,4 +16,8 @@ public class PersonService {
         return personRepository.findAll();
     }
 
+    public Person getOnePerson(String firstName, String lastName) {
+        return personRepository.findPersonByFullName(firstName, lastName);
+    }
+
 }

@@ -24,4 +24,15 @@ public class PersonRepository {
         return persons;
     }
 
+    public Person findPersonByFullName(String firstName, String lastName) {
+        for (Person person : persons) {
+            System.out.println(person.getFirstName());
+            System.out.println(person.getLastName());
+            if(person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)) {
+                return person;
+            }
+        }
+        return null;
+    }
+
 }

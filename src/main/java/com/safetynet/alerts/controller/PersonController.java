@@ -18,4 +18,9 @@ public class PersonController {
         return personService.getPersons();
     }
 
+    @GetMapping("/person/{firstname}/{lastname}")
+    public Person getOnePerson(@PathVariable("firstname") String firstName, @PathVariable("lastname") String lastName) {
+        return personService.getOnePerson(firstName, lastName);
+    }
+
 }
