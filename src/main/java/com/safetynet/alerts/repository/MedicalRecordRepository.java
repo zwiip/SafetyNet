@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.model.MedicalRecord;
+import com.safetynet.alerts.model.Person;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -21,4 +22,13 @@ public class MedicalRecordRepository {
     }
 
     public List<MedicalRecord> findAll() { return medicalRecords; }
+
+    public MedicalRecord findMedicalRecordsByFullName(String firstName, String lastName) {
+        for (MedicalRecord medicalRecord : medicalRecords) {
+            if(medicalRecord.getFirstName().equals(firstName) && medicalRecord.getLastName().equals(lastName)) {
+                return medicalRecord;
+            }
+        }
+        return null;
+    }
 }

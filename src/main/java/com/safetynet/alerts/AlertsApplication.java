@@ -5,6 +5,7 @@ import com.safetynet.alerts.controller.PersonController;
 import com.safetynet.alerts.repository.FireStationRepository;
 import com.safetynet.alerts.repository.MedicalRecordRepository;
 import com.safetynet.alerts.repository.PersonRepository;
+import com.safetynet.alerts.service.MedicalRecordService;
 import com.safetynet.alerts.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -34,6 +35,9 @@ public class AlertsApplication implements CommandLineRunner {
 
 	@Autowired
 	MedicalRecordRepository medicalRecordRepository;
+
+	@Autowired
+	MedicalRecordService medicalRecordService;
 
 	@Override
 	public void run(String... args) throws Exception {
