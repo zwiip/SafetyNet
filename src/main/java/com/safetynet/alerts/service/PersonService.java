@@ -12,7 +12,8 @@ public class PersonService {
     @Autowired
     private PersonRepository personRepository;
 
-    public List<Person> findAll() {
+    public List<Person> getPersons() {
+        List<Person> persons = personRepository.findAll();
         return persons;
     }
 
