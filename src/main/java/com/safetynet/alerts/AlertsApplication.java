@@ -3,6 +3,7 @@ package com.safetynet.alerts;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.safetynet.alerts.controller.PersonController;
 import com.safetynet.alerts.repository.FireStationRepository;
+import com.safetynet.alerts.repository.MedicalRecordRepository;
 import com.safetynet.alerts.repository.PersonRepository;
 import com.safetynet.alerts.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,14 @@ public class AlertsApplication implements CommandLineRunner {
 	@Autowired
 	FireStationRepository fireStationRepository;
 
+	@Autowired
+	MedicalRecordRepository medicalRecordRepository;
+
 	@Override
 	public void run(String... args) throws Exception {
 		JsonNode data = dataRepository.getData();
 		personRepository.createListPersons(data);
 		fireStationRepository.createListFireStations(data);
+		medicalRecordRepository.createListMedicalRecords(data);
 	}
 }
