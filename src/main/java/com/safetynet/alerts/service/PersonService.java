@@ -13,8 +13,7 @@ public class PersonService {
     private PersonRepository personRepository;
 
     public List<Person> getPersons() {
-        List<Person> persons = personRepository.findAll();
-        return persons;
+        return personRepository.findAll();
     }
 
 }

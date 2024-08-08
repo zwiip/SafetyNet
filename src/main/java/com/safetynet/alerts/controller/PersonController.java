@@ -18,9 +18,4 @@ public class PersonController {
         return personService.getPersons();
     }
 
-    /*@PostMapping("/person/{id}") {
-        public String addPerson(@RequestBody Person person) {
-
-        }
-    }*/
 }
