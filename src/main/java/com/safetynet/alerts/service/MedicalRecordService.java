@@ -20,7 +20,7 @@ public class MedicalRecordService {
 
     public List<MedicalRecord> getMedicalRecords() { return medicalRecordRepository.findAll(); }
 
-    public boolean isChild(String firstName, String lastName) {
+    public long getAge(String firstName, String lastName) {
         MedicalRecord medicalRecord = medicalRecordRepository.findMedicalRecordsByFullName(firstName, lastName);
         String stringBirthDate = medicalRecord.getBirthdate();
         try {
@@ -28,16 +28,24 @@ public class MedicalRecordService {
             Date birthday = formatter.parse(stringBirthDate);
             Date today = new Date();
             long diffInMillies = Math.abs(today.getTime() - birthday.getTime());
-            long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS)/365;
-            if (diff <= 18) {
-                return true;
-            } else {
-                return false;
-            }
+            long age = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS)/365;
+            return age;
 
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return false;
+        return 12345;
+    }
+
+    public boolean isChild(String firstName, String lastName) {
+        MedicalRecord medicalRecord = medicalRecordRepository.findMedicalRecordsByFullName(firstName, lastName);
+        String stringBirthDate = medicalRecord.getBirthdate();
+        if (getAge(firstName, lastName) == 12345) {
+            throw new ArithmeticException("something went wrong with the age calculation");
+        } else if (getAge(firstName, lastName) <= 18) {
+                return true;
+            } else {
+                return false;
+            }
     }
 }
