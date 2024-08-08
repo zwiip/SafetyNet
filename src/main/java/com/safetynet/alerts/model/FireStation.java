@@ -28,8 +28,6 @@ public class FireStation {
     }
 
     @Override
-
-    @Override
     public String toString() {
         return "FireStation{" +
                 "address='" + address +
