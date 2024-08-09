@@ -7,6 +7,7 @@ import com.safetynet.alerts.model.Person;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -33,6 +34,16 @@ public class PersonRepository {
             }
         }
         return null;
+    }
+
+    public List<Person> findPersonByAddress(String address) {
+        List<Person> outputPersonsList = new ArrayList<>();
+        for (Person person : persons) {
+            if(person.getAddress().equals(address)) {
+                outputPersonsList.add(person);
+            }
+        }
+        return outputPersonsList;
     }
 
 }
