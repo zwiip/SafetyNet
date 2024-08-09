@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class FireStationController {
@@ -28,7 +29,7 @@ public class FireStationController {
     }
 
     @GetMapping("phoneAlert")
-    public ArrayList<String> getPhoneList(@RequestParam String firestation){
+    public Set<String> getPhoneList(@RequestParam String firestation){
         return fireStationService.createPhoneList(firestation);
     }
 }

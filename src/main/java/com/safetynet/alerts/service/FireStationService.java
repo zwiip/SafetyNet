@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class FireStationService {
@@ -45,8 +47,8 @@ public class FireStationService {
         return new CoveredPersonsListDTO(childCounter, adultsCounter, fireStationPersonsList);
     }
 
-    public ArrayList<String> createPhoneList(String firestationNumber) {
-        ArrayList<String> phoneList = new ArrayList<>();
+    public Set<String> createPhoneList(String firestationNumber) {
+        Set<String> phoneList = new HashSet<>();
         for (String address : getCoveredAddresses(firestationNumber)) {
             for (Person person : personRepository.findAll())  {
                 if (person.getAddress().equals(address)) {
