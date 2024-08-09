@@ -1,5 +1,6 @@
 package com.safetynet.alerts.controller;
 
+import com.safetynet.alerts.controller.dto.CoveredPersonsListDTO;
 import com.safetynet.alerts.controller.dto.PersonDTO;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.service.FireStationService;
@@ -23,7 +24,7 @@ public class FireStationController {
     }
 
     @GetMapping("/firestation")
-    public List<PersonDTO> getFireStationPersonsList(@RequestParam String stationNumber) {
+    public CoveredPersonsListDTO getFireStationPersonsList(@RequestParam String stationNumber) {
         return fireStationService.createFireStationPersonsList(stationNumber);
     }
 }

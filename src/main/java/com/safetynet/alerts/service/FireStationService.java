@@ -1,5 +1,6 @@
 package com.safetynet.alerts.service;
 
+import com.safetynet.alerts.controller.dto.CoveredPersonsListDTO;
 import com.safetynet.alerts.controller.dto.PersonDTO;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.model.Person;
@@ -9,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class FireStationService {
@@ -27,7 +26,7 @@ public class FireStationService {
         return fireStationRepository.findAll();
     }
 
-    public List<PersonDTO> createFireStationPersonsList(String stationNumber) {
+    public CoveredPersonsListDTO createFireStationPersonsList(String stationNumber) {
         int childCounter = 0;
         int adultsCounter = 0;
         ArrayList<PersonDTO> fireStationPersonsList = new ArrayList<>();
@@ -43,7 +42,7 @@ public class FireStationService {
                 }
             }
         }
-        return fireStationPersonsList;
+        return new CoveredPersonsListDTO(childCounter, adultsCounter, fireStationPersonsList);
     }
 
     public ArrayList<String> getCoveredAddresses(String stationNumber) {
