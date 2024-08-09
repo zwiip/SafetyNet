@@ -1,5 +1,6 @@
 package com.safetynet.alerts.service;
 
+import com.safetynet.alerts.controller.dto.PersonDTO;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.FireStationRepository;
@@ -26,10 +27,10 @@ public class FireStationService {
         return fireStationRepository.findAll();
     }
 
-    public String createFireStationPersonsList(String stationNumber) {
+    public List<PersonDTO> createFireStationPersonsList(String stationNumber) {
         int childCounter = 0;
         int adultsCounter = 0;
-        ArrayList<Map<String, String>> fireStationPersonsList = new ArrayList<>();
+        ArrayList<PersonDTO> fireStationPersonsList = new ArrayList<>();
         for (String address : getCoveredAddresses(stationNumber)) {
             for (Person person : personRepository.findAll())  {
                 if (person.getAddress().equals(address)) {
@@ -38,20 +39,11 @@ public class FireStationService {
                     } else {
                         adultsCounter++;
                     }
-                    Map<String, String> fireStationPersonsListPerson = new HashMap<>();
-                    fireStationPersonsListPerson.put("firstName", person.getFirstName());
-                    fireStationPersonsListPerson.put("lastName", person.getLastName());
-                    fireStationPersonsListPerson.put("address", person.getAddress());
-                    fireStationPersonsListPerson.put("phone", person.getPhone());
-                    fireStationPersonsList.add(fireStationPersonsListPerson);
+                    fireStationPersonsList.add(new PersonDTO(person.getFirstName(), person.getLastName(), person.getAddress(), person.getPhone()));
                 }
             }
         }
-
-        return "Pour la station n°" + stationNumber +
-                "\n le nombre d'enfants est de " + childCounter +
-                "\n le nombre d'adultes est de " + adultsCounter +
-                "\n " + fireStationPersonsList;
+        return fireStationPersonsList;
     }
 
     public ArrayList<String> getCoveredAddresses(String stationNumber) {

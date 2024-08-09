@@ -1,5 +1,6 @@
 package com.safetynet.alerts.controller;
 
+import com.safetynet.alerts.controller.dto.PersonDTO;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.service.FireStationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class FireStationController {
     }
 
     @GetMapping("/firestation")
-    public String getFireStationPersonsList(@RequestParam String stationNumber) {
+    public List<PersonDTO> getFireStationPersonsList(@RequestParam String stationNumber) {
         return fireStationService.createFireStationPersonsList(stationNumber);
     }
 }
