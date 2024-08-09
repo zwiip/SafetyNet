@@ -1,8 +1,8 @@
 package com.safetynet.alerts.service;
 
-import com.safetynet.alerts.controller.dto.CoveredPersonsListDTO;
-import com.safetynet.alerts.controller.dto.PersonDTO;
+import com.safetynet.alerts.controller.dto.*;
 import com.safetynet.alerts.model.FireStation;
+import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.FireStationRepository;
 import com.safetynet.alerts.repository.PersonRepository;
@@ -23,6 +23,8 @@ public class FireStationService {
     private PersonRepository personRepository;
     @Autowired
     private MedicalRecordService medicalRecordService;
+    @Autowired
+    private PersonService personService;
 
     public List<FireStation> getFireStations() {
         return fireStationRepository.findAll();
@@ -59,6 +61,18 @@ public class FireStationService {
         return phoneList;
     }
 
+    public PersonsListInCaseOfFireDTO createPersonsAtThisAddressList(String address) {
+        String stationNumber = getStationNumber(address);
+        ArrayList<PersonsAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
+        for ( Person person : personService.getPersonsByAddress(address)) {
+            long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
+            MedicalRecord medicalRecord = medicalRecordService.getOneMedicalRecord(person.getFirstName(), person.getLastName());
+            MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
+            personsAtThisAddressList.add(new PersonsAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
+        }
+        return new PersonsListInCaseOfFireDTO(stationNumber, personsAtThisAddressList);
+    }
+
     public ArrayList<String> getCoveredAddresses(String stationNumber) {
         ArrayList<String> coveredAddresses = new ArrayList<>();
 
@@ -68,5 +82,14 @@ public class FireStationService {
             }
         }
         return coveredAddresses;
+    }
+
+    public String getStationNumber(String address) {
+        for(FireStation firesStation : getFireStations()) {
+            if(firesStation.getAddress().equals(address)) {
+                return firesStation.getStation();
+            }
+        }
+        return null;
     }
 }

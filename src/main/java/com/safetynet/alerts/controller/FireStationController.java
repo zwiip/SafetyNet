@@ -1,6 +1,7 @@
 package com.safetynet.alerts.controller;
 
 import com.safetynet.alerts.controller.dto.CoveredPersonsListDTO;
+import com.safetynet.alerts.controller.dto.PersonsListInCaseOfFireDTO;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.service.FireStationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,13 @@ public class FireStationController {
         return fireStationService.createFireStationPersonsList(stationNumber);
     }
 
-    @GetMapping("phoneAlert")
+    @GetMapping("/phoneAlert")
     public Set<String> getPhoneList(@RequestParam String firestation){
         return fireStationService.createPhoneList(firestation);
+    }
+
+    @GetMapping("fire")
+    public PersonsListInCaseOfFireDTO getPersonsAtThisAddress(@RequestParam String address) {
+        return fireStationService.createPersonsAtThisAddressList(address);
     }
 }

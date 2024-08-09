@@ -20,6 +20,10 @@ public class MedicalRecordService {
 
     public List<MedicalRecord> getMedicalRecords() { return medicalRecordRepository.findAll(); }
 
+    public MedicalRecord getOneMedicalRecord(String firstName, String lastName) {
+        return medicalRecordRepository.findMedicalRecordsByFullName(firstName, lastName);
+    }
+
     public long getAge(String firstName, String lastName) {
         MedicalRecord medicalRecord = medicalRecordRepository.findMedicalRecordsByFullName(firstName, lastName);
         String stringBirthDate = medicalRecord.getBirthdate();
