@@ -28,7 +28,7 @@ public class MedicalRecordService {
         MedicalRecord medicalRecord = medicalRecordRepository.findMedicalRecordsByFullName(firstName, lastName);
         String stringBirthDate = medicalRecord.getBirthdate();
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/mm/yyyy", Locale.FRANCE);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
             Date birthday = formatter.parse(stringBirthDate);
             Date today = new Date();
             long diffInMillies = Math.abs(today.getTime() - birthday.getTime());
