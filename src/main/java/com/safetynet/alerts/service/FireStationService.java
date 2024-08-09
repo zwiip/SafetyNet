@@ -45,6 +45,18 @@ public class FireStationService {
         return new CoveredPersonsListDTO(childCounter, adultsCounter, fireStationPersonsList);
     }
 
+    public ArrayList<String> createPhoneList(String firestationNumber) {
+        ArrayList<String> phoneList = new ArrayList<>();
+        for (String address : getCoveredAddresses(firestationNumber)) {
+            for (Person person : personRepository.findAll())  {
+                if (person.getAddress().equals(address)) {
+                    phoneList.add(person.getPhone());
+                }
+            }
+        }
+        return phoneList;
+    }
+
     public ArrayList<String> getCoveredAddresses(String stationNumber) {
         ArrayList<String> coveredAddresses = new ArrayList<>();
 

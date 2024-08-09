@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,5 +27,10 @@ public class FireStationController {
     @GetMapping("/firestation")
     public CoveredPersonsListDTO getFireStationPersonsList(@RequestParam String stationNumber) {
         return fireStationService.createFireStationPersonsList(stationNumber);
+    }
+
+    @GetMapping("phoneAlert")
+    public ArrayList<String> getPhoneList(@RequestParam String firestation){
+        return fireStationService.createPhoneList(firestation);
     }
 }
