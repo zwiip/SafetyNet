@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class PersonController {
@@ -25,7 +26,7 @@ public class PersonController {
     }
 
     @GetMapping("/childAlert")
-    public ChildAlertDTO getChildAlertList(@RequestParam String address) {
+    public Optional<ChildAlertDTO> getChildAlertList(@RequestParam String address) {
         return personService.createChildAlertList(address);
     }
 }
