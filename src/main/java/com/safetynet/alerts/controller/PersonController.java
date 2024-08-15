@@ -35,4 +35,9 @@ public class PersonController {
         public List<PersonInfoLastNameDTO> getPersonInfoLastName(@RequestParam String lastName) {
         return personService.getPersonsByLastName(lastName);
     }
+
+    @GetMapping("/communityEmail")
+    public List<String> getCommunityEmail(@RequestParam String city) {
+        return personService.getPersonsEmails(city);
+    }
 }

@@ -27,8 +27,6 @@ public class PersonRepository {
 
     public Person findPersonByFullName(String firstName, String lastName) {
         for (Person person : persons) {
-            System.out.println(person.getFirstName());
-            System.out.println(person.getLastName());
             if(person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)) {
                 return person;
             }
@@ -56,4 +54,13 @@ public class PersonRepository {
         return outputPersonsList;
     }
 
+    public List<Person> findPersonsByCity(String city) {
+        List<Person> outputPersonsList = new ArrayList<>();
+        for (Person person : persons) {
+            if(person.getCity().equals(city)) {
+                outputPersonsList.add(person);
+            }
+        }
+        return outputPersonsList;
+    }
 }

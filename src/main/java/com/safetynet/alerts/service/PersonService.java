@@ -62,4 +62,12 @@ public class PersonService {
             return Optional.of(new ChildAlertDTO(childrenList, adultsList));
         }
     }
+
+    public List<String> getPersonsEmails(String city) {
+        ArrayList<String> emails = new ArrayList<>();
+        for (Person person : personRepository.findPersonsByCity(city)) {
+            emails.add(person.getEmail());
+        }
+        return emails;
+    }
 }

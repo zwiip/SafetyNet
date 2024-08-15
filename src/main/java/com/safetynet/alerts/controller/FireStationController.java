@@ -1,6 +1,7 @@
 package com.safetynet.alerts.controller;
 
 import com.safetynet.alerts.controller.dto.CoveredPersonsListDTO;
+import com.safetynet.alerts.controller.dto.FloodAlertDTO;
 import com.safetynet.alerts.controller.dto.PersonsListInCaseOfFireDTO;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.service.FireStationService;
@@ -33,8 +34,14 @@ public class FireStationController {
         return fireStationService.createPhoneList(firestation);
     }
 
-    @GetMapping("fire")
+    @GetMapping("/fire")
     public PersonsListInCaseOfFireDTO getPersonsAtThisAddress(@RequestParam String address) {
         return fireStationService.createPersonsAtThisAddressList(address);
     }
+
+    @GetMapping("/flood/stations")
+    public List<FloodAlertDTO> getAddressesAndPersonsCovered(@RequestParam List<String> stations) {
+        return fireStationService.createFloodAlertList(stations);
+    }
+
 }

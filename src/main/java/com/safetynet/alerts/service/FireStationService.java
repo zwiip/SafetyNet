@@ -63,12 +63,12 @@ public class FireStationService {
 
     public PersonsListInCaseOfFireDTO createPersonsAtThisAddressList(String address) {
         String stationNumber = getStationNumber(address);
-        ArrayList<PersonsAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
+        ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
         for ( Person person : personService.getPersonsByAddress(address)) {
             long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
             MedicalRecord medicalRecord = medicalRecordService.getOneMedicalRecord(person.getFirstName(), person.getLastName());
             MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
-            personsAtThisAddressList.add(new PersonsAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
+            personsAtThisAddressList.add(new PersonAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
         }
         return new PersonsListInCaseOfFireDTO(stationNumber, personsAtThisAddressList);
     }
@@ -91,5 +91,23 @@ public class FireStationService {
             }
         }
         return null;
+    }
+
+    public List<FloodAlertDTO> createFloodAlertList(List<String> stations) {
+        List<FloodAlertDTO> floodAlertList = new ArrayList<>();
+        for (String station : stations) {
+            for (String address : getCoveredAddresses(station)) {
+                ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
+                for ( Person person : personService.getPersonsByAddress(address)) {
+                    long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
+                    MedicalRecord medicalRecord = medicalRecordService.getOneMedicalRecord(person.getFirstName(), person.getLastName());
+                    MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
+                    personsAtThisAddressList.add(new PersonAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
+                }
+                floodAlertList.add(new FloodAlertDTO(address, personsAtThisAddressList));
+            }
+
+        }
+        return floodAlertList;
     }
 }

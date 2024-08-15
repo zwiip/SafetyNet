@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public class PersonsListInCaseOfFireDTO {
     String stationNumber;
-    ArrayList<PersonsAtThisAddressDTO> personsAtThisAddress;
+    ArrayList<PersonAtThisAddressDTO> personsAtThisAddress;
 
-    public PersonsListInCaseOfFireDTO(String stationNumber, ArrayList<PersonsAtThisAddressDTO> personsAtThisAddress) {
+    public PersonsListInCaseOfFireDTO(String stationNumber, ArrayList<PersonAtThisAddressDTO> personsAtThisAddress) {
         this.stationNumber = stationNumber;
         this.personsAtThisAddress = personsAtThisAddress;
     }
@@ -15,7 +15,7 @@ public class PersonsListInCaseOfFireDTO {
         return stationNumber;
     }
 
-    public ArrayList<PersonsAtThisAddressDTO> getPersonsAtThisAddress() {
+    public ArrayList<PersonAtThisAddressDTO> getPersonsAtThisAddress() {
         return personsAtThisAddress;
     }
 }

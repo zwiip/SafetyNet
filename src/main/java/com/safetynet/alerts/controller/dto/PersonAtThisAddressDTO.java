@@ -1,14 +1,12 @@
 package com.safetynet.alerts.controller.dto;
 
-import java.util.ArrayList;
-
-public class PersonsAtThisAddressDTO {
+public class PersonAtThisAddressDTO {
     String lastName;
     String phone;
     long age;
     MedicalRecordDTO medicalRecord;
 
-    public PersonsAtThisAddressDTO(String lastName, String phone, long age, MedicalRecordDTO medicalRecord) {
+    public PersonAtThisAddressDTO(String lastName, String phone, long age, MedicalRecordDTO medicalRecord) {
         this.lastName = lastName;
         this.phone = phone;
         this.age = age;
