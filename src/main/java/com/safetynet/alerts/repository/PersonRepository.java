@@ -36,6 +36,16 @@ public class PersonRepository {
         return null;
     }
 
+    public List<Person> findPersonsByLastName(String lastName) {
+        List<Person> outputPersonsList = new ArrayList<>();
+        for (Person person : persons) {
+            if(person.getLastName().equals(lastName)) {
+                outputPersonsList.add(person);
+            }
+        }
+        return outputPersonsList;
+    }
+
     public List<Person> findPersonByAddress(String address) {
         List<Person> outputPersonsList = new ArrayList<>();
         for (Person person : persons) {
