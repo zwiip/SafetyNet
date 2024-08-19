@@ -36,20 +36,11 @@ public class MedicalRecordService {
             return age;
 
         } catch (ParseException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException(e);
         }
-        return 12345;
     }
 
     public boolean isChild(String firstName, String lastName) {
-        MedicalRecord medicalRecord = medicalRecordRepository.findMedicalRecordsByFullName(firstName, lastName);
-        String stringBirthDate = medicalRecord.getBirthdate();
-        if (getAge(firstName, lastName) == 12345) {
-            throw new ArithmeticException("something went wrong with the age calculation");
-        } else if (getAge(firstName, lastName) <= 18) {
-                return true;
-            } else {
-                return false;
-            }
+        return getAge(firstName, lastName) <= 18;
     }
 }

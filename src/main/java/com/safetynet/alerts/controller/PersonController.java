@@ -27,7 +27,7 @@ public class PersonController {
     }
 
     @GetMapping("/childAlert")
-    public Optional<ChildAlertDTO> getChildAlertList(@RequestParam String address) {
+    public ChildAlertDTO getChildAlertList(@RequestParam String address) {
         return personService.createChildAlertList(address);
     }
 

@@ -45,7 +45,7 @@ public class PersonService {
         return personRepository.findPersonByAddress(address);
     }
 
-    public Optional<ChildAlertDTO> createChildAlertList(String address) {
+    public ChildAlertDTO createChildAlertList(String address) {
         ArrayList<FullNameAndAgeDTO> adultsList = new ArrayList<>();
         ArrayList<FullNameAndAgeDTO> childrenList = new ArrayList<>();
         for (Person person : getPersonsByAddress(address)) {
@@ -56,11 +56,7 @@ public class PersonService {
                 adultsList.add(new FullNameAndAgeDTO(person.getFirstName(), person.getLastName(), age));
             }
         }
-        if (childrenList.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(new ChildAlertDTO(childrenList, adultsList));
-        }
+            return new ChildAlertDTO(childrenList, adultsList);
     }
 
     public List<String> getPersonsEmails(String city) {
