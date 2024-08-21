@@ -9,7 +9,7 @@ import java.io.IOException;
 
 @Repository
 public class DataRepository {
-    ObjectMapper objectMapper = new ObjectMapper();
+    public ObjectMapper objectMapper = new ObjectMapper();
 
     public JsonNode getData() {
         try {
