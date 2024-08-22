@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PersonService {
@@ -29,7 +28,7 @@ public class PersonService {
     public Person getOnePerson(String firstName, String lastName) {
         return personRepository.findPersonByFullName(firstName, lastName);
     }
-
+    
     public List<PersonInfoLastNameDTO> getPersonsByLastName(String lastName) {
         List<PersonInfoLastNameDTO> personInfoLastNameDTOList = new ArrayList<>();
         for (Person person : personRepository.findPersonsByLastName(lastName)) {

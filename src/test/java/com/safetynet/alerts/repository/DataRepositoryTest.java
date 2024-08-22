@@ -1,9 +1,11 @@
+package com.safetynet.alerts.repository;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.alerts.repository.DataRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,20 +16,15 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 class DataRepositoryTest {
 
+    @Autowired
     private DataRepository dataRepository;
-    private ObjectMapper objectMapperMock;
 
-    @BeforeEach
-    void setUp() {
-        objectMapperMock = mock(ObjectMapper.class);
-        dataRepository = new DataRepository();
-        dataRepository.objectMapper = objectMapperMock;
-    }
+    @MockBean
+    private ObjectMapper objectMapperMock;
 
     @Test
     void getData_shouldReturnJsonNode_whenFileIsValid() throws IOException {
         // Arrange
-        File fileMock = mock(File.class);
         JsonNode jsonNodeMock = mock(JsonNode.class);
 
         when(objectMapperMock.readTree(any(File.class))).thenReturn(jsonNodeMock);
