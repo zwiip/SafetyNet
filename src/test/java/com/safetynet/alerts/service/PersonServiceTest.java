@@ -1,7 +1,6 @@
 package com.safetynet.alerts.service;
 
 import com.safetynet.alerts.controller.dto.ChildAlertDTO;
-import com.safetynet.alerts.controller.dto.MedicalRecordDTO;
 import com.safetynet.alerts.controller.dto.PersonInfoLastNameDTO;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
@@ -28,7 +27,6 @@ class PersonServiceTest {
 
     @MockBean
     private MedicalRecordService medicalRecordService;
-
 
     @Test
     void getPersons_shouldReturnListOfAllPersonsFromRepository() {
@@ -119,6 +117,27 @@ class PersonServiceTest {
         // Assert
         assertEquals(1, actualChildAlert.getChildList().size());
         assertEquals(2, actualChildAlert.getOtherMembersList().size());
+        verify(personRepositoryMock).findPersonByAddress("Green Gables");
+        verify(medicalRecordService).getAge("Anne", "Shirley");
     }
 
+    @Test
+    void getPersonEmails_shouldReturnAListOfEmails() {
+        // Arrange
+        List<Person> persons = new ArrayList<>();
+        persons.add(new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com" ));
+        persons.add(new Person("Diana", "Barry","Orchard Slope", "Avonlea", "12345", "0987654321", "diana.barry@avonlea.com" ));
+        persons.add(new Person("Marrila", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marrila.cuthbert@avonlea.com" ));
+        persons.add(new Person("Matthew", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "matthew.cuthbert@avonlea.com" ));
+
+        doReturn(persons).when(personRepositoryMock).findPersonsByCity("Avonlea");
+
+        // Act
+        List<String> emails = personService.getPersonsEmails("Avonlea");
+
+        // Assert
+        assertEquals("anne.shirley@avonlea.com", emails.get(0));
+        assertEquals("marrila.cuthbert@avonlea.com", emails.get(2));
+        verify(personRepositoryMock).findPersonsByCity("Avonlea");
+    }
 }
