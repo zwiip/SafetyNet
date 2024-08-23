@@ -34,8 +34,8 @@ public class FireStationService {
         int childCounter = 0;
         int adultsCounter = 0;
         ArrayList<PersonDTO> fireStationPersonsList = new ArrayList<>();
-        for (String address : getCoveredAddresses(stationNumber)) {
-            for (Person person : personRepository.findAll())  {
+        for (String address : fireStationRepository.getCoveredAddresses(stationNumber)) {
+            for (Person person : personService.getPersons())  {
                 if (person.getAddress().equals(address)) {
                     if (medicalRecordService.isChild(person.getFirstName(), person.getLastName())) {
                         childCounter++;
@@ -51,8 +51,8 @@ public class FireStationService {
 
     public Set<String> createPhoneList(String firestationNumber) {
         Set<String> phoneList = new HashSet<>();
-        for (String address : getCoveredAddresses(firestationNumber)) {
-            for (Person person : personRepository.findAll())  {
+        for (String address : fireStationRepository.getCoveredAddresses(firestationNumber)) {
+            for (Person person : personService.getPersons())  {
                 if (person.getAddress().equals(address)) {
                     phoneList.add(person.getPhone());
                 }
@@ -62,7 +62,7 @@ public class FireStationService {
     }
 
     public PersonsListInCaseOfFireDTO createPersonsAtThisAddressList(String address) {
-        String stationNumber = getStationNumber(address);
+        String stationNumber = fireStationRepository.getStationNumber(address);
         ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
         for ( Person person : personService.getPersonsByAddress(address)) {
             long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
@@ -73,30 +73,10 @@ public class FireStationService {
         return new PersonsListInCaseOfFireDTO(stationNumber, personsAtThisAddressList);
     }
 
-    public ArrayList<String> getCoveredAddresses(String stationNumber) {
-        ArrayList<String> coveredAddresses = new ArrayList<>();
-
-        for(FireStation firesStation : getFireStations()) {
-            if(firesStation.getStation().equals(stationNumber)) {
-                coveredAddresses.add(firesStation.getAddress());
-            }
-        }
-        return coveredAddresses;
-    }
-
-    public String getStationNumber(String address) {
-        for(FireStation firesStation : getFireStations()) {
-            if(firesStation.getAddress().equals(address)) {
-                return firesStation.getStation();
-            }
-        }
-        return null;
-    }
-
     public List<FloodAlertDTO> createFloodAlertList(List<String> stations) {
         List<FloodAlertDTO> floodAlertList = new ArrayList<>();
         for (String station : stations) {
-            for (String address : getCoveredAddresses(station)) {
+            for (String address : fireStationRepository.getCoveredAddresses(station)) {
                 ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
                 for ( Person person : personService.getPersonsByAddress(address)) {
                     long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());

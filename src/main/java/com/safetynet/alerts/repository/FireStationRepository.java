@@ -7,6 +7,7 @@ import com.safetynet.alerts.model.FireStation;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -22,5 +23,25 @@ public class FireStationRepository {
 
     public List<FireStation> findAll() {
         return fireStations;
+    }
+
+    public ArrayList<String> getCoveredAddresses(String stationNumber) {
+        ArrayList<String> coveredAddresses = new ArrayList<>();
+
+        for(FireStation firesStation : findAll()) {
+            if(firesStation.getStation().equals(stationNumber)) {
+                coveredAddresses.add(firesStation.getAddress());
+            }
+        }
+        return coveredAddresses;
+    }
+
+    public String getStationNumber(String address) {
+        for(FireStation firesStation : findAll()) {
+            if(firesStation.getAddress().equals(address)) {
+                return firesStation.getStation();
+            }
+        }
+        return null;
     }
 }

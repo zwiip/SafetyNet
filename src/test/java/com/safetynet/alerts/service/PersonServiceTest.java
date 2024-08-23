@@ -107,9 +107,9 @@ class PersonServiceTest {
         personsAtThisAddress.add(new Person("Matthew", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "matthew.cuthbert@avonlea.com" ));
 
         doReturn(personsAtThisAddress).when(personRepositoryMock).findPersonByAddress("Green Gables");
-        doReturn(Long.valueOf(55)).when(medicalRecordService).getAge("Matthew", "Cuthbert");
-        doReturn(Long.valueOf(45)).when(medicalRecordService).getAge("Marrila", "Cuthbert");
-        doReturn(Long.valueOf(13)).when(medicalRecordService).getAge("Anne", "Shirley");
+        doReturn(55L).when(medicalRecordService).getAge("Matthew", "Cuthbert");
+        doReturn(45L).when(medicalRecordService).getAge("Marrila", "Cuthbert");
+        doReturn(13L).when(medicalRecordService).getAge("Anne", "Shirley");
 
         // Act
         ChildAlertDTO actualChildAlert = personService.createChildAlertList("Green Gables");
