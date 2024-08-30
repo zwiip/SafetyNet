@@ -70,4 +70,14 @@ public class PersonService {
         Person personAdded = personRepository.save(person);
         return personAdded;
     }
+
+    public void deleteOnePerson(String firstName, String lastName) {
+        Person person = getOnePerson(firstName, lastName);
+        personRepository.delete(person);
+    }
+
+    public Person updatePerson(Person person) {
+        Person personUpdated = personRepository.update(person);
+        return personUpdated;
+    }
 }

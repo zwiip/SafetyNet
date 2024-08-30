@@ -10,10 +10,18 @@ import java.io.IOException;
 @Repository
 public class DataRepository {
     public ObjectMapper objectMapper = new ObjectMapper();
+    private final File file;
+
+    public DataRepository() {
+        this.file = new File("./src/main/resources/data.json");
+    }
+
+    public DataRepository(String path) {
+        this.file = new File(path);
+    }
 
     public JsonNode getData() {
         try {
-            File file = new File("./src/main/resources/data.json");
             JsonNode data = objectMapper.readTree(file);
             return data;
 
@@ -21,5 +29,4 @@ public class DataRepository {
             throw new RuntimeException(ex);
         }
     }
-
 }

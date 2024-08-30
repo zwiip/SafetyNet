@@ -68,4 +68,13 @@ public class PersonRepository {
         persons.add(person);
         return person;
     }
+
+    public void delete(Person person) {
+        persons.remove(person);
+    }
+
+    public Person update(Person person) {
+        persons.set(persons.indexOf(person), person);
+        return person;
+    }
 }

@@ -59,4 +59,18 @@ public class PersonController {
                 .toUri();
         return ResponseEntity.created(location).build();
     }
+
+    @DeleteMapping(value="/person")
+    public void deleteOnePerson(@RequestParam String firstName, @RequestParam String lastName) {
+        personService.deleteOnePerson(firstName, lastName);
+    }
+
+    @PutMapping(value="/person")
+    public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) {
+        Person personDeleted = personService.updatePerson(person);
+        if (Objects.isNull(personDeleted)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(personDeleted);
+    }
 }
