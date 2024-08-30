@@ -63,4 +63,9 @@ public class PersonRepository {
         }
         return outputPersonsList;
     }
+
+    public Person save(Person person) {
+        persons.add(person);
+        return person;
+    }
 }

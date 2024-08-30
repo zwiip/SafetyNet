@@ -65,4 +65,9 @@ public class PersonService {
         }
         return emails;
     }
+
+    public Person createPerson(Person person) {
+        Person personAdded = personRepository.save(person);
+        return personAdded;
+    }
 }

@@ -5,9 +5,13 @@ import com.safetynet.alerts.controller.dto.PersonInfoLastNameDTO;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -39,5 +43,20 @@ public class PersonController {
     @GetMapping("/communityEmail")
     public List<String> getCommunityEmail(@RequestParam String city) {
         return personService.getPersonsEmails(city);
+    }
+
+    @PostMapping(value="/person")
+    public ResponseEntity<Person> addOnePerson(@RequestBody Person person) {
+        Person personAdded = personService.createPerson(person);
+        if (Objects.isNull(personAdded)) {
+            return ResponseEntity.noContent().build();
+        }
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{firstname}/{lastname}")
+                .buildAndExpand(personAdded.getFirstName(), personAdded.getLastName())
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 }
