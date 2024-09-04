@@ -2,10 +2,14 @@ package com.safetynet.alerts.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.safetynet.alerts.model.MedicalRecord;
+import com.safetynet.alerts.model.Person;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 @Repository
 public class DataRepository {
@@ -22,9 +26,16 @@ public class DataRepository {
 
     public JsonNode getData() {
         try {
-            JsonNode data = objectMapper.readTree(file);
-            return data;
+            return objectMapper.readTree(file);
 
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void writeData(JsonNode data) {
+        try {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

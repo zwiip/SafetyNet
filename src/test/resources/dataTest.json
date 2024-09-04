@@ -1,1 +1,49 @@
-{"firstName":"Anne","lastName":"Shirley"}
+{
+  "persons": [
+    {
+      "firstName": "Anne",
+      "lastName": "Shirley",
+      "address": "Green Gables",
+      "city": "Avonlea",
+      "zip": "12345",
+      "phone": "0123456789",
+      "email": "anne.shirley@avonlea.com"
+    },
+    {
+      "firstName": "Diana",
+      "lastName": "Barry",
+      "address": "Orchard Slope",
+      "city": "Avonlea",
+      "zip": "12345",
+      "phone": "0987654321",
+      "email": "diana.barry@avonlea.com"
+    },
+    {
+      "firstName": "Marrila",
+      "lastName": "Cuthbert",
+      "address": "Green Gables",
+      "city": "Avonlea",
+      "zip": "12345",
+      "phone": "0123456789",
+      "email": "marrila.cuthbert@avonlea.com"
+    },
+    {
+      "firstName": "Matthew",
+      "lastName": "Cuthbert",
+      "address": "Green Gables",
+      "city": "Avonlea",
+      "zip": "12345",
+      "phone": "0123456789",
+      "email": "matthew.cuthbert@avonlea.com"
+    },
+    {
+      "firstName": "Josephine",
+      "lastName": "Barry",
+      "address": "Big House",
+      "city": "Charlottetown",
+      "zip": "54321",
+      "phone": "135798642",
+      "email": "josephine.barry@aunt.com"
+    }
+  ]
+}

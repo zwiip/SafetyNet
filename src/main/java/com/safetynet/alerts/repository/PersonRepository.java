@@ -3,6 +3,7 @@ package com.safetynet.alerts.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.safetynet.alerts.model.Person;
 import org.springframework.stereotype.Repository;
 
@@ -13,12 +14,23 @@ import java.util.List;
 @Repository
 public class PersonRepository {
     List<Person> persons;
+    private final DataRepository dataRepository;
 
-    public void createListPersons(JsonNode jsonNode) throws IOException {
-        JsonNode personsNode = jsonNode.get("persons");
-        TypeReference<List<Person>> typeReferenceList = new TypeReference<List<Person>>() {};
-        List<Person> persons = new ObjectMapper().readValue(personsNode.traverse(), typeReferenceList);
-        this.persons = persons;
+    public PersonRepository(DataRepository dataRepository) {
+        this.dataRepository = dataRepository;
+        createListPersons();
+    }
+
+    public void createListPersons() {
+        try {
+            JsonNode data = dataRepository.getData();
+            JsonNode personsNode = data.get("persons");
+            ObjectMapper objectMapper = new ObjectMapper();
+            TypeReference<List<Person>> typeReferenceList = new TypeReference<List<Person>>() {};
+            this.persons = objectMapper.readValue(personsNode.traverse(), typeReferenceList);
+        } catch (IOException e) {
+            throw new RuntimeException("Error while creating Persons List", e);
+        }
     }
 
     public List<Person> findAll() {
@@ -64,17 +76,27 @@ public class PersonRepository {
         return outputPersonsList;
     }
 
-    public Person save(Person person) {
+    public Person save(Person person) throws IOException {
         persons.add(person);
+        updatePersonsList(persons);
         return person;
     }
 
-    public void delete(Person person) {
+    public void delete(Person person) throws IOException {
         persons.remove(person);
+        updatePersonsList(persons);
     }
 
-    public Person update(Person person) {
+    public Person update(Person person) throws IOException {
         persons.set(persons.indexOf(person), person);
+        updatePersonsList(persons);
         return person;
+    }
+
+    public void updatePersonsList(List<Person> persons) throws IOException {
+        ObjectNode rootNode = (ObjectNode) dataRepository.getData();
+        ObjectMapper objectMapper = new ObjectMapper();
+        ((ObjectNode) dataRepository.getData()).set("persons", objectMapper.valueToTree(persons));
+        dataRepository.writeData(rootNode);
     }
 }

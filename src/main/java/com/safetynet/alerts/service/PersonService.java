@@ -10,6 +10,7 @@ import com.safetynet.alerts.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,17 +67,17 @@ public class PersonService {
         return emails;
     }
 
-    public Person createPerson(Person person) {
+    public Person createPerson(Person person) throws IOException {
         Person personAdded = personRepository.save(person);
         return personAdded;
     }
 
-    public void deleteOnePerson(String firstName, String lastName) {
+    public void deleteOnePerson(String firstName, String lastName) throws IOException {
         Person person = getOnePerson(firstName, lastName);
         personRepository.delete(person);
     }
 
-    public Person updatePerson(Person person) {
+    public Person updatePerson(Person person) throws IOException {
         Person personUpdated = personRepository.update(person);
         return personUpdated;
     }

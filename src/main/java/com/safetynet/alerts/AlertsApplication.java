@@ -22,12 +22,7 @@ public class AlertsApplication implements CommandLineRunner {
 	}
 
 	@Autowired
-	private DataRepository dataRepository;
-	@Autowired
 	private PersonRepository personRepository;
-
-	@Autowired
-	PersonController personController;
 
 	@Autowired
 	FireStationRepository fireStationRepository;
@@ -35,14 +30,8 @@ public class AlertsApplication implements CommandLineRunner {
 	@Autowired
 	MedicalRecordRepository medicalRecordRepository;
 
-	@Autowired
-	MedicalRecordService medicalRecordService;
-
 	@Override
 	public void run(String... args) throws Exception {
-		JsonNode data = dataRepository.getData();
-		personRepository.createListPersons(data);
-		fireStationRepository.createListFireStations(data);
-		medicalRecordRepository.createListMedicalRecords(data);
+
 	}
 }

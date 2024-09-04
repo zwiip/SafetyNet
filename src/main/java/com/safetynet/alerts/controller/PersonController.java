@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +47,7 @@ public class PersonController {
     }
 
     @PostMapping(value="/person")
-    public ResponseEntity<Person> addOnePerson(@RequestBody Person person) {
+    public ResponseEntity<Person> addOnePerson(@RequestBody Person person) throws IOException {
         Person personAdded = personService.createPerson(person);
         if (Objects.isNull(personAdded)) {
             return ResponseEntity.noContent().build();
@@ -61,12 +62,12 @@ public class PersonController {
     }
 
     @DeleteMapping(value="/person")
-    public void deleteOnePerson(@RequestParam String firstName, @RequestParam String lastName) {
+    public void deleteOnePerson(@RequestParam String firstName, @RequestParam String lastName) throws IOException {
         personService.deleteOnePerson(firstName, lastName);
     }
 
     @PutMapping(value="/person")
-    public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) {
+    public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) throws IOException {
         Person personDeleted = personService.updatePerson(person);
         if (Objects.isNull(personDeleted)) {
             return ResponseEntity.noContent().build();
