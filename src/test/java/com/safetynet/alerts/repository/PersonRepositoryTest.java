@@ -67,7 +67,6 @@ public class PersonRepositoryTest {
         assertNull(wantedPerson);
     }
 
-    // TODO j'en suis ici
     @Test
     void findPersonByLastName_shouldReturnAListOfCorrectPersons() {
         // Act
