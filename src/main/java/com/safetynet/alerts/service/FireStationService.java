@@ -19,12 +19,18 @@ public class FireStationService {
 
     @Autowired
     private FireStationRepository fireStationRepository;
-    @Autowired
-    private PersonRepository personRepository;
+
     @Autowired
     private MedicalRecordService medicalRecordService;
     @Autowired
     private PersonService personService;
+
+    @Autowired
+    public FireStationService(FireStationRepository fireStationRepository, PersonService personService, MedicalRecordService medicalRecordService) {
+        this.fireStationRepository = fireStationRepository;
+        this.personService = personService;
+        this.medicalRecordService = medicalRecordService;
+    }
 
     public List<FireStation> getFireStations() {
         return fireStationRepository.findAll();

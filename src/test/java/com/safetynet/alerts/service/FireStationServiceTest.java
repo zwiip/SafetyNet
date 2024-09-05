@@ -7,11 +7,11 @@ import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.FireStationRepository;
-import com.safetynet.alerts.repository.PersonRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,22 +20,24 @@ import java.util.Set;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class FireStationServiceTest {
 
-    @Autowired
     private FireStationService fireStationService;
 
-    @MockBean
+    @Mock
     private FireStationRepository fireStationRepositoryMock;
 
-    @MockBean
+    @Mock
     private PersonService personServiceMock;
 
-    @MockBean
+    @Mock
     private MedicalRecordService medicalRecordServiceMock;
-    @Autowired
-    private PersonRepository personRepository;
+
+    @BeforeEach
+    public void setUp() {
+        fireStationService = new FireStationService(fireStationRepositoryMock, personServiceMock, medicalRecordServiceMock);
+    }
 
     @Test
     void getFireStations_shouldReturnAllFireStations() {
@@ -66,7 +68,7 @@ public class FireStationServiceTest {
         List<Person> persons = new ArrayList<>();
         persons.add(new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com" ));
         persons.add(new Person("Diana", "Barry","Orchard Slope", "Avonlea", "12345", "0987654321", "diana.barry@avonlea.com" ));
-        persons.add(new Person("Marrila", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marrila.cuthbert@avonlea.com" ));
+        persons.add(new Person("Marilla", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marilla.cuthbert@avonlea.com" ));
         persons.add(new Person("Matthew", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "matthew.cuthbert@avonlea.com" ));
 
         doReturn(coveredAddress).when(fireStationRepositoryMock).getCoveredAddresses("1");
@@ -75,7 +77,7 @@ public class FireStationServiceTest {
 
         doReturn(true).when(medicalRecordServiceMock).isChild("Anne", "Shirley");
         doReturn(true).when(medicalRecordServiceMock).isChild("Diana", "Barry");
-        doReturn(false).when(medicalRecordServiceMock).isChild("Marrila", "Cuthbert");
+        doReturn(false).when(medicalRecordServiceMock).isChild("Marilla", "Cuthbert");
         doReturn(false).when(medicalRecordServiceMock).isChild("Matthew", "Cuthbert");
 
         // Act
@@ -97,7 +99,7 @@ public class FireStationServiceTest {
         List<Person> persons = new ArrayList<>();
         persons.add(new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com" ));
         persons.add(new Person("Diana", "Barry","Orchard Slope", "Avonlea", "12345", "0987654321", "diana.barry@avonlea.com" ));
-        persons.add(new Person("Marrila", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marrila.cuthbert@avonlea.com" ));
+        persons.add(new Person("Marilla", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marilla.cuthbert@avonlea.com" ));
         persons.add(new Person("Matthew", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "matthew.cuthbert@avonlea.com" ));
         persons.add(new Person("Josephine", "Barry","Big House", "Charlottetown", "54321", "135798642", "josephine.barry@aunt.com" ));
 
@@ -119,17 +121,17 @@ public class FireStationServiceTest {
 
         List<Person> personsAtThisAddres = new ArrayList<>();
         personsAtThisAddres.add(new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com" ));
-        personsAtThisAddres.add(new Person("Marrila", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marrila.cuthbert@avonlea.com" ));
+        personsAtThisAddres.add(new Person("Marilla", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marilla.cuthbert@avonlea.com" ));
         personsAtThisAddres.add(new Person("Matthew", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "matthew.cuthbert@avonlea.com" ));
 
         doReturn(personsAtThisAddres).when(personServiceMock).getPersonsByAddress("Green Gables");
 
         doReturn(13L).when(medicalRecordServiceMock).getAge("Anne", "Shirley");
-        doReturn(45L).when(medicalRecordServiceMock).getAge("Marrila", "Cuthbert");
+        doReturn(45L).when(medicalRecordServiceMock).getAge("Marilla", "Cuthbert");
         doReturn(55L).when(medicalRecordServiceMock).getAge("Matthew", "Cuthbert");
 
         doReturn(new MedicalRecord("Anne", "Shirley", "01/01/2011", new ArrayList<>(List.of("")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Anne", "Shirley");
-        doReturn(new MedicalRecord("Marrila", "Cuthbert", "01/01/1960", new ArrayList<>(List.of("eyedrops:2drops")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Marrila", "Cuthbert");
+        doReturn(new MedicalRecord("Marilla", "Cuthbert", "01/01/1960", new ArrayList<>(List.of("eyedrops:2drops")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Marilla", "Cuthbert");
         doReturn(new MedicalRecord("Matthew", "Cuthbert", "01/01/1955", new ArrayList<>(List.of("heartpills:100mg")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Matthew", "Cuthbert");
 
         // Act
@@ -148,7 +150,7 @@ public class FireStationServiceTest {
 
         List<Person> greenGablesPersons = new ArrayList<>();
         greenGablesPersons.add(new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com" ));
-        greenGablesPersons.add(new Person("Marrila", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marrila.cuthbert@avonlea.com" ));
+        greenGablesPersons.add(new Person("Marilla", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marilla.cuthbert@avonlea.com" ));
         doReturn(greenGablesPersons).when(personServiceMock).getPersonsByAddress("Green Gables");
 
         List<Person> orchardSlopePersons = new ArrayList<>();
@@ -159,10 +161,10 @@ public class FireStationServiceTest {
         doReturn(13L).when(medicalRecordServiceMock).getAge("Anne", "Shirley");
         doReturn(13L).when(medicalRecordServiceMock).getAge("Diana", "Barry");
         doReturn(45L).when(medicalRecordServiceMock).getAge("George", "Barry");
-        doReturn(55L).when(medicalRecordServiceMock).getAge("Marrila", "Cuthbert");
+        doReturn(55L).when(medicalRecordServiceMock).getAge("Marilla", "Cuthbert");
 
         doReturn(new MedicalRecord("Anne", "Shirley", "01/01/2011", new ArrayList<>(List.of("")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Anne", "Shirley");
-        doReturn(new MedicalRecord("Marrila", "Cuthbert", "01/01/1960", new ArrayList<>(List.of("eyedrops:2drops")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Marrila", "Cuthbert");
+        doReturn(new MedicalRecord("Marilla", "Cuthbert", "01/01/1960", new ArrayList<>(List.of("eyedrops:2drops")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Marilla", "Cuthbert");
         doReturn(new MedicalRecord("Diana", "Barry", "01/01/2011", new ArrayList<>(List.of("heartpills:100mg")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Diana", "Barry");
         doReturn(new MedicalRecord("George", "Barry", "01/01/1950", new ArrayList<>(List.of("doliprane:500mg")), new ArrayList<>(List.of("bees", "strawberries")))).when(medicalRecordServiceMock).getOneMedicalRecord("George", "Barry");
 

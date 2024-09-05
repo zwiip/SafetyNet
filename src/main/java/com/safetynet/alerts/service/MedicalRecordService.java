@@ -18,6 +18,11 @@ public class MedicalRecordService {
     @Autowired
     private MedicalRecordRepository medicalRecordRepository;
 
+    @Autowired
+    public MedicalRecordService(MedicalRecordRepository medicalRecordRepository) {
+        this.medicalRecordRepository = medicalRecordRepository;
+    }
+
     public List<MedicalRecord> getMedicalRecords() { return medicalRecordRepository.findAll(); }
 
     public MedicalRecord getOneMedicalRecord(String firstName, String lastName) {
