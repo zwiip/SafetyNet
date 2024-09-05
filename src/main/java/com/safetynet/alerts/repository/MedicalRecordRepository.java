@@ -50,15 +50,26 @@ public class MedicalRecordRepository {
         return medicalRecord;
     }
 
-    public void delete(MedicalRecord medicalRecord) throws IOException {
-        medicalRecords.remove(medicalRecord);
-        updateMedicalRecordsList(medicalRecords);
+    public void delete(MedicalRecord inputMedicalRecord) throws IOException {
+        for (MedicalRecord medicalRecord : medicalRecords) {
+            if(medicalRecord.equals(inputMedicalRecord)) {
+                medicalRecords.remove(medicalRecord);
+                updateMedicalRecordsList(medicalRecords);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("MedicalRecord not found: " + inputMedicalRecord);
     }
 
-    public MedicalRecord update(MedicalRecord medicalRecord) throws IOException {
-        medicalRecords.set(medicalRecords.indexOf(medicalRecord), medicalRecord);
-        updateMedicalRecordsList(medicalRecords);
-        return medicalRecord;
+    public MedicalRecord update(MedicalRecord inputMedicalRecord) throws IOException {
+        for (MedicalRecord medicalRecord : medicalRecords) {
+            if(medicalRecord.equals(inputMedicalRecord)) {
+                medicalRecords.set(medicalRecords.indexOf(medicalRecord), inputMedicalRecord);
+                updateMedicalRecordsList(medicalRecords);
+                return inputMedicalRecord;
+            }
+        }
+        throw new IllegalArgumentException("MedicalRecord not found: " + inputMedicalRecord);
     }
 
     public void updateMedicalRecordsList(List<MedicalRecord> medicalRecords) throws IOException {

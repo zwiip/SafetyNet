@@ -82,15 +82,26 @@ public class PersonRepository {
         return person;
     }
 
-    public void delete(Person person) throws IOException {
-        persons.remove(person);
-        updatePersonsList(persons);
+    public void delete(Person inputPerson) throws IOException {
+        for (Person person : persons) {
+            if(person.equals(inputPerson)) {
+                persons.remove(person);
+                updatePersonsList(persons);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Person not found: " + inputPerson);
     }
 
-    public Person update(Person person) throws IOException {
-        persons.set(persons.indexOf(person), person);
-        updatePersonsList(persons);
-        return person;
+    public Person update(Person inputPerson) throws IOException {
+        for (Person person : persons) {
+            if(person.equals(inputPerson)) {
+                persons.set(persons.indexOf(person), inputPerson);
+                updatePersonsList(persons);
+                return person;
+            }
+        }
+        throw new IllegalArgumentException("Person not found: " + inputPerson);
     }
 
     public void updatePersonsList(List<Person> persons) throws IOException {
