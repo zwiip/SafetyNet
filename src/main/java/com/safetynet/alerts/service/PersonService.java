@@ -22,6 +22,12 @@ public class PersonService {
     @Autowired
     private MedicalRecordService medicalRecordService;
 
+    @Autowired
+    public PersonService(PersonRepository personRepository, MedicalRecordService medicalRecordService) {
+        this.personRepository = personRepository;
+        this.medicalRecordService = medicalRecordService;
+    }
+
     public List<Person> getPersons() {
         return personRepository.findAll();
     }

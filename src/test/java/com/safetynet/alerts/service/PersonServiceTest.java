@@ -5,10 +5,11 @@ import com.safetynet.alerts.controller.dto.PersonInfoLastNameDTO;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.PersonRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +17,21 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-class PersonServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class PersonServiceTest {
 
-    @Autowired
     private PersonService personService;
 
-    @MockBean
+    @Mock
     private PersonRepository personRepositoryMock;
 
-    @MockBean
-    private MedicalRecordService medicalRecordService;
+    @Mock
+    private MedicalRecordService medicalRecordServiceMock;
+
+    @BeforeEach
+    public void setUp() {
+        personService = new PersonService(personRepositoryMock, medicalRecordServiceMock);
+    }
 
     @Test
     void getPersons_shouldReturnListOfAllPersonsFromRepository() {
@@ -64,18 +69,18 @@ class PersonServiceTest {
     void getPersonsByLastName_shouldReturnALisOfCorrectPersons() {
         // Arrange
         List<Person> expectedPersons = new ArrayList<>();
-        expectedPersons.add(new Person("Marrila", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marrila.cuthbert@avonlea.com" ));
+        expectedPersons.add(new Person("Marilla", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marilla.cuthbert@avonlea.com" ));
         expectedPersons.add(new Person("Matthew", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "matthew.cuthbert@avonlea.com" ));
 
         doReturn(expectedPersons).when(personRepositoryMock).findPersonsByLastName("Cuthbert");
-        doReturn(new MedicalRecord("Marrila", "Cuthbert", "01/01/1960", new ArrayList<>(List.of("eyedrops:2drops")), new ArrayList<>(List.of("")))).when(medicalRecordService).getOneMedicalRecord("Marrila", "Cuthbert");
-        doReturn(new MedicalRecord("Matthew", "Cuthbert", "01/01/1955", new ArrayList<>(List.of("heartpills:100mg")), new ArrayList<>(List.of("")))).when(medicalRecordService).getOneMedicalRecord("Matthew", "Cuthbert");
+        doReturn(new MedicalRecord("Marilla", "Cuthbert", "01/01/1960", new ArrayList<>(List.of("eyedrops:2drops")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Marilla", "Cuthbert");
+        doReturn(new MedicalRecord("Matthew", "Cuthbert", "01/01/1955", new ArrayList<>(List.of("heartpills:100mg")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Matthew", "Cuthbert");
 
         // Act
         List<PersonInfoLastNameDTO> wantedPersons = personService.getPersonsByLastName("Cuthbert");
 
         // Assert
-        assertEquals("marrila.cuthbert@avonlea.com", wantedPersons.get(0).getMail());
+        assertEquals("marilla.cuthbert@avonlea.com", wantedPersons.get(0).getMail());
         assertEquals("matthew.cuthbert@avonlea.com", wantedPersons.get(1).getMail());
         verify(personRepositoryMock).findPersonsByLastName("Cuthbert");
     }
@@ -85,7 +90,7 @@ class PersonServiceTest {
         // Arrange
         List<Person> expectedPersons = new ArrayList<>();
         expectedPersons.add(new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com" ));
-        expectedPersons.add(new Person("Marrila", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marrila.cuthbert@avonlea.com" ));
+        expectedPersons.add(new Person("Marilla", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marilla.cuthbert@avonlea.com" ));
         expectedPersons.add(new Person("Matthew", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "matthew.cuthbert@avonlea.com" ));
 
         doReturn(expectedPersons).when(personRepositoryMock).findPersonByAddress("Green Gables");
@@ -103,13 +108,13 @@ class PersonServiceTest {
         // Arrange
         List<Person> personsAtThisAddress = new ArrayList<>();
         personsAtThisAddress.add(new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com" ));
-        personsAtThisAddress.add(new Person("Marrila", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marrila.cuthbert@avonlea.com" ));
+        personsAtThisAddress.add(new Person("Marilla", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marilla.cuthbert@avonlea.com" ));
         personsAtThisAddress.add(new Person("Matthew", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "matthew.cuthbert@avonlea.com" ));
 
         doReturn(personsAtThisAddress).when(personRepositoryMock).findPersonByAddress("Green Gables");
-        doReturn(55L).when(medicalRecordService).getAge("Matthew", "Cuthbert");
-        doReturn(45L).when(medicalRecordService).getAge("Marrila", "Cuthbert");
-        doReturn(13L).when(medicalRecordService).getAge("Anne", "Shirley");
+        doReturn(55L).when(medicalRecordServiceMock).getAge("Matthew", "Cuthbert");
+        doReturn(45L).when(medicalRecordServiceMock).getAge("Marilla", "Cuthbert");
+        doReturn(13L).when(medicalRecordServiceMock).getAge("Anne", "Shirley");
 
         // Act
         ChildAlertDTO actualChildAlert = personService.createChildAlertList("Green Gables");
@@ -118,7 +123,7 @@ class PersonServiceTest {
         assertEquals(1, actualChildAlert.getChildList().size());
         assertEquals(2, actualChildAlert.getOtherMembersList().size());
         verify(personRepositoryMock).findPersonByAddress("Green Gables");
-        verify(medicalRecordService).getAge("Anne", "Shirley");
+        verify(medicalRecordServiceMock).getAge("Anne", "Shirley");
     }
 
     @Test
@@ -127,7 +132,7 @@ class PersonServiceTest {
         List<Person> persons = new ArrayList<>();
         persons.add(new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com" ));
         persons.add(new Person("Diana", "Barry","Orchard Slope", "Avonlea", "12345", "0987654321", "diana.barry@avonlea.com" ));
-        persons.add(new Person("Marrila", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marrila.cuthbert@avonlea.com" ));
+        persons.add(new Person("Marilla", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "marilla.cuthbert@avonlea.com" ));
         persons.add(new Person("Matthew", "Cuthbert", "Green Gables", "Avonlea", "12345", "0123456789", "matthew.cuthbert@avonlea.com" ));
 
         doReturn(persons).when(personRepositoryMock).findPersonsByCity("Avonlea");
@@ -137,7 +142,7 @@ class PersonServiceTest {
 
         // Assert
         assertEquals("anne.shirley@avonlea.com", emails.get(0));
-        assertEquals("marrila.cuthbert@avonlea.com", emails.get(2));
+        assertEquals("marilla.cuthbert@avonlea.com", emails.get(2));
         verify(personRepositoryMock).findPersonsByCity("Avonlea");
     }
 }
