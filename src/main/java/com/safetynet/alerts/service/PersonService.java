@@ -73,8 +73,7 @@ public class PersonService {
     }
 
     public void deleteOnePerson(String firstName, String lastName) throws IOException {
-        Person person = getOnePerson(firstName, lastName);
-        personRepository.delete(person);
+        personRepository.delete(firstName, lastName);
     }
 
     public Person updatePerson(Person person) throws IOException {

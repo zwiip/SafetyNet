@@ -62,6 +62,10 @@
 
   ],
   "medicalrecords": [
-
+    { "firstName":"Anne", "lastName":"Shirley", "birthdate":"01/02/2010",  "medications":[], "allergies":[] },
+    { "firstName":"Diana", "lastName":"Barry", "birthdate":"03/03/2010", "medications":[], "allergies":["peanut"] },
+    { "firstName":"Marilla", "lastName":"Cuthbert", "birthdate":"02/18/1974", "medications":["pharmacol:5000mg", "terazine:10mg", "noznazol:250mg"], "allergies":[] },
+    { "firstName":"Matthew", "lastName":"Cuthbert", "birthdate":"09/06/1968", "medications":["aznol:350mg", "hydrapermazol:100mg"], "allergies":["nillacilan"] },
+    { "firstName":"Josephine", "lastName":"Barry","birthdate":"01/08/1962", "medications":["tetracyclaz:650mg"], "allergies":["xilliathal"] }
   ]
 }

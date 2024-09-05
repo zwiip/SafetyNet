@@ -1,96 +1,121 @@
 package com.safetynet.alerts.repository;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.model.MedicalRecord;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
 public class MedicalRecordRepositoryTest {
 
-    @Autowired
     private MedicalRecordRepository repository;
 
     @BeforeEach
-    public void setUp() {
-        repository = new MedicalRecordRepository();
+    public void setUp() throws IOException {
+        DataRepository dataRepositoryMock = mock(DataRepository.class);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        File jsonFile = new File("./src/test/resources/dataTest.json");
+        JsonNode jsonNode = new ObjectMapper().readTree(jsonFile);
+
+        doReturn(jsonNode).when(dataRepositoryMock).getData();
+
+        repository = new MedicalRecordRepository(dataRepositoryMock);
+        JsonNode medicalRecordsNode = jsonNode.get("medicalrecords");
+
+        TypeReference<List<MedicalRecord>> typeReferenceList = new TypeReference<List<MedicalRecord>>() {};
+        repository.medicalRecords = objectMapper.readValue(medicalRecordsNode.traverse(), typeReferenceList);
     }
 
-    @Test
-    void createListMedicalRecords_shouldPopulateMedicalRecordsList() throws IOException {
-        // Arrange
-        String jsonContent = "{ \"medicalrecords\": [" +
-                "{ \"firstName\":\"John\", \"lastName\":\"Boyd\", \"birthdate\":\"03/06/1984\", \"medications\":[\"aznol:350mg\", \"hydrapermazol:100mg\"], \"allergies\":[\"nillacilan\"] }," +
-                "{ \"firstName\":\"Jacob\", \"lastName\":\"Boyd\", \"birthdate\":\"03/06/1989\", \"medications\":[\"pharmacol:5000mg\", \"terazine:10mg\", \"noznazol:250mg\"], \"allergies\":[] }" +
-                "] }";
-        JsonNode jsonNode = new ObjectMapper().readTree(jsonContent);
-
-        // Act
-        repository.createListMedicalRecords(jsonNode);
-
-        // Assert
-        List<MedicalRecord> medicalRecords = repository.findAll();
-        assertEquals(2, medicalRecords.size());
-        assertEquals("John", medicalRecords.get(0).getFirstName());
-        assertEquals("Jacob", medicalRecords.get(1).getFirstName());
+    @AfterEach
+    public void restoreOriginalFile() throws IOException {
+        Files.copy(Paths.get("./src/test/resources/originalDataTest.json"),
+                Paths.get("./src/test/resources/dataTest.json"),
+                StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Test
     void findAll_shouldReturnAllMedicalRecords() {
-        // Arrange
-        List<MedicalRecord> expectedMedicalRecords = new ArrayList<>();
-        expectedMedicalRecords.add(new MedicalRecord("Roger", "Boyd", "09/06/2017", new ArrayList<>(List.of("")), new ArrayList<>(List.of(""))));
-        expectedMedicalRecords.add(new MedicalRecord("Felicia", "Boyd", "01/08/1986", new ArrayList<>(List.of("tetracyclaz:650mg")),new ArrayList<>(List.of("xilliathal"))));
-
-        repository.medicalRecords = expectedMedicalRecords;
-
         // Act
         List<MedicalRecord> actualMedicalRecords = repository.findAll();
 
         // Assert
-        assertEquals(expectedMedicalRecords, actualMedicalRecords);
+        assertEquals(5, actualMedicalRecords.size());
+        assertEquals("Anne", actualMedicalRecords.get(0).getFirstName());
+        assertEquals("03/03/2010", actualMedicalRecords.get(1).getBirthdate());
     }
 
     @Test
     void findMedicalRecordByFullName_shouldReturnCorrectMedicalRecord() {
-        // Arrange
-        List<MedicalRecord> medicalRecordList = new ArrayList<>();
-        medicalRecordList.add(new MedicalRecord("Roger", "Boyd", "09/06/2017", new ArrayList<>(List.of("")), new ArrayList<>(List.of(""))));
-        medicalRecordList.add(new MedicalRecord("Felicia", "Boyd", "01/08/1986", new ArrayList<>(List.of("tetracyclaz:650mg")),new ArrayList<>(List.of("xilliathal"))));
-
-        repository.medicalRecords = medicalRecordList;
-
-        // Act
-        MedicalRecord wantedMedicalRecord = repository.findMedicalRecordsByFullName("Felicia", "Boyd");
-
-        // Assert
-        assertNotNull(wantedMedicalRecord);
-        assertEquals("Felicia", wantedMedicalRecord.getFirstName());
-        assertEquals("Boyd", wantedMedicalRecord.getLastName());
-    }
-
-    @Test
-    void findMedicalRecordByFullName_shouldReturnNull_whenNoMatchFound() {
-        // Arrange
-        List<MedicalRecord> medicalRecordList = new ArrayList<>();
-        medicalRecordList.add(new MedicalRecord("Roger", "Boyd", "09/06/2017", new ArrayList<>(List.of("")), new ArrayList<>(List.of(""))));
-        medicalRecordList.add(new MedicalRecord("Felicia", "Boyd", "01/08/1986", new ArrayList<>(List.of("tetracyclaz:650mg")),new ArrayList<>(List.of("xilliathal"))));
-
-        repository.medicalRecords = medicalRecordList;
-
         // Act
         MedicalRecord wantedMedicalRecord = repository.findMedicalRecordsByFullName("Anne", "Shirley");
 
         // Assert
+        assertEquals("Anne", wantedMedicalRecord.getFirstName());
+        assertEquals("Shirley", wantedMedicalRecord.getLastName());
+    }
+
+    @Test
+    void findMedicalRecordByFullName_shouldReturnNull_whenNoMatchFound() {
+        // Act
+        MedicalRecord wantedMedicalRecord = repository.findMedicalRecordsByFullName("Gilbert", "Blythe");
+
+        // Assert
         assertNull(wantedMedicalRecord);
+    }
+
+    @Test
+    void save_shouldAddMedicalRecordToRepository() throws IOException {
+        // Arrange
+        MedicalRecord newMedicalRecord = new MedicalRecord("Gilbert", "Blythe", "05/09/2010", new ArrayList<>(List.of("")), new ArrayList<>(List.of("")));
+
+        // Act
+        repository.save(newMedicalRecord);
+
+        // Assert
+        assertEquals(6, repository.medicalRecords.size());
+        assertTrue(repository.medicalRecords.contains(newMedicalRecord));
+    }
+
+    @Test
+    void delete_shouldRemoveMedicalRecordFromRepository() throws IOException {
+        // Arrange
+        MedicalRecord medicalRecordToDelete = new MedicalRecord("Anne", "Shirley", "01/02/2010", new ArrayList<>(List.of("")), new ArrayList<>(List.of("")));
+
+        // Act
+        repository.delete("Anne", "Shirley");
+
+        // Assert
+        assertFalse(repository.medicalRecords.contains(medicalRecordToDelete));
+        assertEquals(4, repository.medicalRecords.size());
+    }
+
+    @Test
+    void update_shouldModifyExistingMedicalRecord() throws IOException {
+        // Arrange
+        MedicalRecord medicalRecordToUpdate = new MedicalRecord("Anne", "Shirley", "01/02/2000", new ArrayList<>(List.of("")), new ArrayList<>(List.of("")));
+
+        // Act
+        repository.update(medicalRecordToUpdate);
+
+        // Assert
+        assertTrue(repository.medicalRecords.contains(medicalRecordToUpdate));
+        assertEquals(5, repository.medicalRecords.size());
+        assertEquals("01/02/2000", repository.medicalRecords.get(0).getBirthdate());
     }
 }

@@ -4,11 +4,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.model.Person;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,13 +39,19 @@ public class PersonRepositoryTest {
         repository.persons = objectMapper.readValue(personsNode.traverse(), typeReferenceList);
     }
 
+    @AfterEach
+    public void restoreOriginalFile() throws IOException {
+        Files.copy(Paths.get("./src/test/resources/originalDataTest.json"),
+                Paths.get("./src/test/resources/dataTest.json"),
+                StandardCopyOption.REPLACE_EXISTING);
+    }
+
     @Test
     void findAll_shouldReturnAllPersons() {
         // Act
         List<Person> persons = repository.findAll();
 
         // Assert
-        assertNotNull(persons);
         assertEquals(5, persons.size());
         assertEquals("Anne", persons.get(0).getFirstName());
         assertEquals("Diana", persons.get(1).getFirstName());
@@ -97,4 +107,44 @@ public class PersonRepositoryTest {
         assertEquals("Anne", wantedPersonsList.get(0).getFirstName());
     }
 
+    @Test
+    void save_shouldAddPersonToRepository() throws IOException {
+        // Arrange
+        Person newPerson = new Person("Gilbert", "Blythe", "Old Farm", "Avonlea", "12345", "1598476321", "gilbert.blythe@avonlea.com");
+
+        // Act
+        repository.save(newPerson);
+
+        // Assert
+        assertTrue(repository.persons.contains(newPerson));
+        assertEquals(6, repository.persons.size());
+    }
+
+    @Test
+    void delete_shouldRemovePersonFromRepository() throws IOException {
+        // Arrange
+        Person personToDelete = new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com");
+
+        // Act
+        repository.delete("Anne", "Shirley");
+
+        // Assert
+        assertFalse(repository.persons.contains(personToDelete));
+        assertEquals(4, repository.persons.size());
+    }
+
+    @Test
+    void update_shouldModifyExistingPerson() throws IOException {
+        // Arrange
+        Person updatedPerson = new Person("Anne", "Shirley", "Patty's House", "Redmond", "74185", "0123456789", "anne.shirley@avonlea.com");
+
+        // Act
+        repository.update(updatedPerson);
+
+        // Assert
+        assertTrue(repository.persons.contains(updatedPerson));
+        assertEquals(5, repository.persons.size());
+        assertEquals("Patty's House", repository.persons.get(0).getAddress());
+        assertEquals("Redmond", repository.persons.get(0).getCity());
+    }
 }
