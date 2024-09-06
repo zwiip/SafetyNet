@@ -74,8 +74,7 @@ public class PersonService {
     }
 
     public Person createPerson(Person person) throws IOException {
-        Person personAdded = personRepository.save(person);
-        return personAdded;
+        return personRepository.save(person);
     }
 
     public void deleteOnePerson(String firstName, String lastName) throws IOException {
@@ -83,7 +82,6 @@ public class PersonService {
     }
 
     public Person updatePerson(Person person) throws IOException {
-        Person personUpdated = personRepository.update(person);
-        return personUpdated;
+        return personRepository.update(person);
     }
 }

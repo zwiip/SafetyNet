@@ -9,6 +9,7 @@ import com.safetynet.alerts.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -95,5 +96,17 @@ public class FireStationService {
 
         }
         return floodAlertList;
+    }
+
+    public FireStation createFireStation(FireStation fireStation) throws IOException {
+        return fireStationRepository.save(fireStation);
+    }
+
+    public void deleteFireStation(String address) throws IOException {
+        fireStationRepository.delete(address);
+    }
+
+    public FireStation updateFireStation(FireStation fireStation) throws IOException {
+        return fireStationRepository.update(fireStation);
     }
 }

@@ -121,7 +121,7 @@ public class FireStationRepositoryTest {
         FireStation fireStationToDelete = new FireStation("Green Gables", "1");
 
         // Act
-        repository.delete(fireStationToDelete);
+        repository.delete("Green Gables");
 
         // Assert
         List<FireStation> fireStations = repository.fireStations;

@@ -63,16 +63,15 @@ public class FireStationRepository {
         return fireStation;
     }
 
-    public void delete(FireStation inputFireStation) throws IOException {
+    public void delete(String inputAddress) throws IOException {
         for (FireStation firesStation : fireStations) {
-            if(firesStation.getAddress().equals(inputFireStation.getAddress()) &&
-               firesStation.getStation().equals(inputFireStation.getStation())) {
+            if(firesStation.getAddress().equals(inputAddress)) {
                 fireStations.remove(firesStation);
                 updateFireStationsList(fireStations);
                 return;
             }
         }
-        throw new IllegalArgumentException("FireStation not found: " + inputFireStation);
+        throw new IllegalArgumentException("FireStation not found: " + inputAddress);
     }
 
     public FireStation update(FireStation inputFireStation) {

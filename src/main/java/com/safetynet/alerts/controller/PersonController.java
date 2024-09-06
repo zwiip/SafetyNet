@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 public class PersonController {
@@ -68,10 +67,10 @@ public class PersonController {
 
     @PutMapping(value="/person")
     public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) throws IOException {
-        Person personDeleted = personService.updatePerson(person);
-        if (Objects.isNull(personDeleted)) {
+        Person personToUpdate = personService.updatePerson(person);
+        if (Objects.isNull(personToUpdate)) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(personDeleted);
+        return ResponseEntity.ok(personToUpdate);
     }
 }
