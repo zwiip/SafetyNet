@@ -77,7 +77,7 @@ public class MedicalRecordRepository {
     public void updateMedicalRecordsList(List<MedicalRecord> medicalRecords) throws IOException {
         ObjectNode rootNode = (ObjectNode) dataRepository.getData();
         ObjectMapper objectMapper = new ObjectMapper();
-        ((ObjectNode) dataRepository.getData()).set("medicalrecords", objectMapper.valueToTree(medicalRecords));
+        rootNode.set("medicalrecords", objectMapper.valueToTree(medicalRecords));
         dataRepository.writeData(rootNode);
     }
 }

@@ -109,7 +109,7 @@ public class PersonRepository {
     public void updatePersonsList(List<Person> persons) throws IOException {
         ObjectNode rootNode = (ObjectNode) dataRepository.getData();
         ObjectMapper objectMapper = new ObjectMapper();
-        ((ObjectNode) dataRepository.getData()).set("persons", objectMapper.valueToTree(persons));
+        rootNode.set("persons", objectMapper.valueToTree(persons));
         dataRepository.writeData(rootNode);
     }
 }

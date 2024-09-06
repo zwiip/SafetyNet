@@ -89,7 +89,7 @@ public class FireStationRepository {
     public void updateFireStationsList(List<FireStation> fireStations) {
         ObjectNode rootNode = (ObjectNode) dataRepository.getData();
         ObjectMapper objectMapper = new ObjectMapper();
-        ((ObjectNode) dataRepository.getData()).set("firestations", objectMapper.valueToTree(fireStations));
+        rootNode.set("firestations", objectMapper.valueToTree(fireStations));
         dataRepository.writeData(rootNode);
     }
 }
