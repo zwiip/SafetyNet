@@ -5,7 +5,6 @@ import com.safetynet.alerts.controller.dto.FloodAlertDTO;
 import com.safetynet.alerts.controller.dto.PersonsListInCaseOfFireDTO;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.service.FireStationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -19,7 +18,7 @@ import java.util.Set;
 @RestController
 public class FireStationController {
 
-    private FireStationService fireStationService;
+    private final FireStationService fireStationService;
 
     public FireStationController(FireStationService fireStationService) {
         this.fireStationService = fireStationService;

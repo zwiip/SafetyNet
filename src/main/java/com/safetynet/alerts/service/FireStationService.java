@@ -101,7 +101,7 @@ public class FireStationService {
         fireStationRepository.delete(address);
     }
 
-    public FireStation updateFireStation(FireStation fireStation) throws IOException {
+    public FireStation updateFireStation(FireStation fireStation) {
         return fireStationRepository.update(fireStation);
     }
 }

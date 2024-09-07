@@ -4,7 +4,6 @@ import com.safetynet.alerts.controller.dto.ChildAlertDTO;
 import com.safetynet.alerts.controller.dto.PersonInfoLastNameDTO;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.service.PersonService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
