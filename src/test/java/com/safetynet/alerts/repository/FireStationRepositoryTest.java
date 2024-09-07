@@ -4,29 +4,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.model.FireStation;
-import com.safetynet.alerts.model.Person;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
 public class FireStationRepositoryTest {
 
-    @Autowired
     private FireStationRepository repository;
 
     @BeforeEach
@@ -44,13 +34,6 @@ public class FireStationRepositoryTest {
 
         TypeReference<List<FireStation>> typeReferenceList = new TypeReference<List<FireStation>>() {};
         repository.fireStations = objectMapper.readValue(firestationsNode.traverse(), typeReferenceList);
-    }
-
-    @AfterEach
-    public void restoreOriginalFile() throws IOException {
-        Files.copy(Paths.get("./src/test/resources/originalDataTest.json"),
-                Paths.get("./src/test/resources/dataTest.json"),
-                StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Test
