@@ -5,8 +5,6 @@ import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.FireStationRepository;
-import com.safetynet.alerts.repository.PersonRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,15 +16,12 @@ import java.util.Set;
 @Service
 public class FireStationService {
 
-    @Autowired
-    private FireStationRepository fireStationRepository;
+    private final FireStationRepository fireStationRepository;
 
-    @Autowired
-    private MedicalRecordService medicalRecordService;
-    @Autowired
-    private PersonService personService;
+    private final MedicalRecordService medicalRecordService;
 
-    @Autowired
+    private final PersonService personService;
+
     public FireStationService(FireStationRepository fireStationRepository, PersonService personService, MedicalRecordService medicalRecordService) {
         this.fireStationRepository = fireStationRepository;
         this.personService = personService;

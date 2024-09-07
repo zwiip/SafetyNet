@@ -7,7 +7,6 @@ import com.safetynet.alerts.controller.dto.PersonInfoLastNameDTO;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.PersonRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,13 +15,11 @@ import java.util.List;
 
 @Service
 public class PersonService {
-    @Autowired
-    private PersonRepository personRepository;
 
-    @Autowired
-    private MedicalRecordService medicalRecordService;
+    private final PersonRepository personRepository;
 
-    @Autowired
+    private final MedicalRecordService medicalRecordService;
+
     public PersonService(PersonRepository personRepository, MedicalRecordService medicalRecordService) {
         this.personRepository = personRepository;
         this.medicalRecordService = medicalRecordService;

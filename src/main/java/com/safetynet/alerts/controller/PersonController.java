@@ -17,8 +17,11 @@ import java.util.Objects;
 @RestController
 public class PersonController {
 
-    @Autowired
-    private PersonService personService;
+    private final PersonService personService;
+
+    public PersonController(PersonService personService) {
+        this.personService = personService;
+    }
 
     @GetMapping("/persons")
     public List<Person> getPersons() {

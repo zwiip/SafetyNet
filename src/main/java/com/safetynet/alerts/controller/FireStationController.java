@@ -19,8 +19,11 @@ import java.util.Set;
 @RestController
 public class FireStationController {
 
-    @Autowired
     private FireStationService fireStationService;
+
+    public FireStationController(FireStationService fireStationService) {
+        this.fireStationService = fireStationService;
+    }
 
     @GetMapping("/firestations")
     public List<FireStation> getFireStations() {

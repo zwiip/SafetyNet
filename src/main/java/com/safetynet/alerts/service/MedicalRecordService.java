@@ -5,6 +5,7 @@ import com.safetynet.alerts.repository.MedicalRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,10 +16,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class MedicalRecordService {
 
-    @Autowired
-    private MedicalRecordRepository medicalRecordRepository;
+    private final MedicalRecordRepository medicalRecordRepository;
 
-    @Autowired
     public MedicalRecordService(MedicalRecordRepository medicalRecordRepository) {
         this.medicalRecordRepository = medicalRecordRepository;
     }
@@ -47,5 +46,9 @@ public class MedicalRecordService {
 
     public boolean isChild(String firstName, String lastName) {
         return getAge(firstName, lastName) <= 18;
+    }
+
+    public MedicalRecord createMedicalRecord(MedicalRecord medicalRecord) throws IOException {
+        return medicalRecordRepository.save(medicalRecord);
     }
 }
