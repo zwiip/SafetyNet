@@ -70,7 +70,7 @@ public class FireStationController {
     }
 
     @PutMapping(value = "/firestation")
-    public ResponseEntity<FireStation> updateFireStation(@RequestBody FireStation firestation) throws IOException {
+    public ResponseEntity<FireStation> updateFireStation(@RequestBody FireStation firestation) {
         FireStation fireStationToUpdate = fireStationService.updateFireStation(firestation);
         if (Objects.isNull(fireStationToUpdate)) {
             return ResponseEntity.noContent().build();

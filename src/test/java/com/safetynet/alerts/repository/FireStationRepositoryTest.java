@@ -113,7 +113,7 @@ public class FireStationRepositoryTest {
     }
 
     @Test
-    void update_shouldModifyExistingFireStation() throws IOException {
+    void update_shouldModifyExistingFireStation() {
         // Arrange
         FireStation updatedFireStation = new FireStation("Green Gables", "3");
 

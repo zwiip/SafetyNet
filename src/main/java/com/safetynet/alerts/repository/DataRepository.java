@@ -2,14 +2,10 @@ package com.safetynet.alerts.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.safetynet.alerts.model.MedicalRecord;
-import com.safetynet.alerts.model.Person;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 @Repository
 public class DataRepository {

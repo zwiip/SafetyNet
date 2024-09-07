@@ -63,8 +63,8 @@ public class PersonController {
     }
 
     @DeleteMapping(value="/person")
-    public void deleteOnePerson(@RequestParam String firstName, @RequestParam String lastName) throws IOException {
-        personService.deleteOnePerson(firstName, lastName);
+    public void deleteOnePerson(@RequestParam String firstname, @RequestParam String lastname) throws IOException {
+        personService.deleteOnePerson(firstname, lastname);
     }
 
     @PutMapping(value="/person")
