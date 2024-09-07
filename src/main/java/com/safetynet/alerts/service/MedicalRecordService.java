@@ -50,4 +50,12 @@ public class MedicalRecordService {
     public MedicalRecord createMedicalRecord(MedicalRecord medicalRecord) throws IOException {
         return medicalRecordRepository.save(medicalRecord);
     }
+
+    public void deleteMedicalRecord(String firstName, String lastName) throws IOException {
+        medicalRecordRepository.delete(firstName, lastName);
+    }
+
+    public MedicalRecord updateMedicalRecord(MedicalRecord medicalRecord) throws IOException {
+        return medicalRecordRepository.update((medicalRecord));
+    }
 }

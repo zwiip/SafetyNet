@@ -3,10 +3,7 @@ package com.safetynet.alerts.controller;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.service.MedicalRecordService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
@@ -38,5 +35,19 @@ public class MedicalRecordController {
                 .buildAndExpand(medicalRecordToAdd.getFirstName(), medicalRecordToAdd.getLastName())
                 .toUri();
         return ResponseEntity.created(location).build();
+    }
+
+    @DeleteMapping(value = "/medicalrecord")
+    public void deleteMedicalRecord(@RequestParam String firstname, @RequestParam String lastname) throws IOException {
+        medicalRecordService.deleteMedicalRecord(firstname, lastname);
+    }
+
+    @PutMapping(value = "/medicalrecord")
+    public ResponseEntity<MedicalRecord> updateMedicalRecord(@RequestBody MedicalRecord medicalRecord) throws IOException {
+        MedicalRecord medicalRecordToUpdate = medicalRecordService.updateMedicalRecord(medicalRecord);
+        if (Objects.isNull(medicalRecordToUpdate)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(medicalRecordToUpdate);
     }
 }
