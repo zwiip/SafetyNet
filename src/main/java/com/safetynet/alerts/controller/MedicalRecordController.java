@@ -2,6 +2,8 @@ package com.safetynet.alerts.controller;
 
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.service.MedicalRecordService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -15,13 +17,15 @@ import java.util.Objects;
 public class MedicalRecordController {
 
     private final MedicalRecordService medicalRecordService;
+    Logger logger = LoggerFactory.getLogger(MedicalRecordController.class);
 
     public MedicalRecordController(MedicalRecordService medicalRecordService) {
         this.medicalRecordService = medicalRecordService;
     }
 
     @GetMapping("/medicalrecords")
-    public List<MedicalRecord> getMedicalRecords() { return medicalRecordService.getMedicalRecords(); }
+    public List<MedicalRecord> getMedicalRecords() {
+        return medicalRecordService.getMedicalRecords(); }
 
     @PostMapping(value = "/medicalrecord")
     public ResponseEntity<MedicalRecord> addMedicalRecord(@RequestBody MedicalRecord medicalRecord) throws IOException {

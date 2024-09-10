@@ -8,11 +8,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -27,7 +28,7 @@ public class MedicalRecordControllerTest {
     private MedicalRecordService medicalRecordServiceMock;
 
     @Test
-    public void testGetMedicalRecords_shouldReturnJsonArray() throws Exception {
+    public void getMedicalRecords_shouldReturnJsonArray() throws Exception {
         // Arrange
         List<MedicalRecord> medicalRecords = new ArrayList<>();
         medicalRecords.add(new MedicalRecord("Anne", "Shirley", "01/01/2011", new ArrayList<>(List.of("")), new ArrayList<>(List.of(""))));
@@ -42,5 +43,19 @@ public class MedicalRecordControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.size()").value(medicalRecords.size()))
                 .andExpect(jsonPath("$[0].firstName").value("Anne"));
+    }
+
+    @Test
+    public void addMedicalRecord_shouldHaveStatusOK_andReturnTheMedicalRecordCreated() throws Exception {
+        // Arrange
+        MedicalRecord medicalRecordToAdd = new MedicalRecord("Felicia", "Boyd", "01/01/2000", new ArrayList<>(List.of("tetracyclaz:650mg")),new ArrayList<>(List.of("xilliathal")));
+
+        doReturn(medicalRecordToAdd).when(medicalRecordServiceMock).createMedicalRecord(medicalRecordToAdd);
+
+        // Act & Assert
+        mockMvc.perform(post("/medicalrecord"))
+                .andExpect(status().isOk());
+
+
     }
 }
