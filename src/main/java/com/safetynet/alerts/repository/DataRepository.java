@@ -12,36 +12,44 @@ import java.io.IOException;
 @Repository
 public class DataRepository {
 
-    /** VARIABLES **/
+    /* VARIABLES */
     Logger logger = LoggerFactory.getLogger(DataRepository.class);
     public ObjectMapper objectMapper = new ObjectMapper();
     private final File file;
 
-    /** CONSTRUCTORS **/
+    /* CONSTRUCTORS */
+    /**
+     * Default constructor, uses the default data file.
+     */
     public DataRepository() {
         this.file = new File("./src/main/resources/data.json");
+        logger.info("Using default data file: {}", file.getPath());
     }
-
-    public DataRepository(String path) {
-        this.file = new File(path);
-    }
-
-    /** METHODS **/
 
     /**
-     * Read a file and turn the data in a JsonNode in order to exploit them
+     * Constructor with file path for flexibility during testing or evolutions
+     * @param path the path to the JSON file.
+     */
+    public DataRepository(String path) {
+        this.file = new File(path);
+        logger.info("Using custom data file: {}", file.getPath());
+    }
+
+    /* METHODS */
+
+    /**
+     * Read the JSON file and turn the content in a JsonNode object in order to exploit it
      *
-     * @return JsonNode of the Data in the file.
-     * @throws RuntimeException if something goes wrong with the reading of the file
+     * @return JsonNode of the Data from the file.
+     * @throws RuntimeException if  an I/O error occurs during file reading
      */
     public JsonNode getData() {
         try {
-            logger.info("Data collected from file");
+            logger.info("Reading data from file: {}", file.getPath());
             return objectMapper.readTree(file);
 
         } catch (IOException e) {
-            logger.error("Something went wrong trying to collect the data from the file" + e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error reading data from file: " + file.getPath(), e);
         }
     }
 
@@ -49,15 +57,14 @@ public class DataRepository {
      * Write the JsonNode with the new data into the JSON file
      *
      * @param data a JsonNode with the updated data
-     * @throws RuntimeException
+     * @throws RuntimeException if an I/O error occurs during file writing
      */
     public void writeData(JsonNode data) {
         try {
-            logger.info("File updated with the new datas");
+            logger.info("Writing data to file: {}", file.getPath());
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
         } catch (IOException e) {
-            logger.error("Something went wrong with the writing of the file" + e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error writing data to file: " + file.getPath(), e);
         }
     }
 }
