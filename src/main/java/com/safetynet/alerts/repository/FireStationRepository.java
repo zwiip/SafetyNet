@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.safetynet.alerts.model.FireStation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -13,15 +15,18 @@ import java.util.List;
 
 @Repository
 public class FireStationRepository {
-    /** VARIABLES **/
+    /* VARIABLES */
+    private static final Logger logger = LoggerFactory.getLogger(FireStationRepository.class);
     List<FireStation> fireStations;
     private final DataRepository dataRepository;
 
-    /** CONSTRUCTOR **/
+    /* CONSTRUCTOR */
     public FireStationRepository(DataRepository dataRepository) {
         this.dataRepository = dataRepository;
         createListFireStations();
     }
+
+    /* METHODS */
 
     /**
      * Take a JsonNode and fetch the values for the key "fireStations" in order to create a list of FireStations
@@ -30,29 +35,35 @@ public class FireStationRepository {
      */
     public void createListFireStations() {
         try {
+            logger.debug("Creating fire stations list from JSON file.");
             JsonNode data = dataRepository.getData();
             JsonNode fireStationsNode = data.get("firestations");
             TypeReference<List<FireStation>> typeReferenceList = new TypeReference<>() {};
             this.fireStations = new ObjectMapper().readValue(fireStationsNode.traverse(), typeReferenceList);
+            logger.info("Successfully created fire stations list.");
         } catch (IOException e) {
             throw new RuntimeException("Error while creating FireStations List", e);
         }
     }
 
     /**
-     * @return the list of fireStations
+     * Retrieves the list of all fire stations
+     *
+     * @return the list of fire stations
      */
     public List<FireStation> findAll() {
+        logger.debug("Fetching all fire stations.");
         return fireStations;
     }
 
     /**
-     * Browse through the fireStations to create a list of addresses covered by the given station number
+     * Browse through the fire stations to create a list of addresses covered by the given station number
      *
-     * @param stationNumber a String representing the number of the station
-     * @return a List of String with the addresses covered by the station number
+     * @param stationNumber a String representing the number of the fire station
+     * @return a List of String with the addresses covered by the fire station
      */
     public ArrayList<String> getCoveredAddresses(String stationNumber) {
+        logger.debug("Fetching addresses covered by station number: {}", stationNumber);
         ArrayList<String> coveredAddresses = new ArrayList<>();
 
         for(FireStation firesStation : findAll()) {
@@ -60,46 +71,55 @@ public class FireStationRepository {
                 coveredAddresses.add(firesStation.getAddress());
             }
         }
+        logger.info("Found {} addresses covered by station number: {}", coveredAddresses.size(), stationNumber);
         return coveredAddresses;
     }
 
     /**
-     * Browse through the fireStations looking for the number of the station covering the given address
+     * Browse through the fire stations looking for the number of the station covering the given address
      *
      * @param address a String of an address
-     * @return a String representing the number of the fireStation covering this address
+     * @return a String representing the number of the fire station covering this address
      */
     public String getStationNumber(String address) {
+        logger.debug("Fetching station number for address: {}", address);
         for(FireStation firesStation : findAll()) {
             if(firesStation.getAddress().equals(address)) {
+                logger.info("Station number found for address: {}", address);
                 return firesStation.getStation();
             }
         }
+        logger.warn("No station number found for address: {}", address);
         return null;
     }
 
     /**
-     * Add a new fireStation to the list and update the file.
+     * Add a new fireStation to the list and update the JSON file.
      *
-     * @param fireStation a new FireStation to add
-     * @return the added fireStation
+     * @param fireStation a new Fire Station to add
+     * @return the added fire station
      */
     public FireStation save(FireStation fireStation) {
+        logger.debug("Saving new fire station: {}", fireStation);
         fireStations.add(fireStation);
         updateFireStationsList(fireStations);
+        logger.info("Fire station saved successfully.");
         return fireStation;
     }
 
     /**
-     * Delete the fireStation matching the given address
+     * Delete the fireStation matching the given address and update the JSON file
      *
      * @param inputAddress a String representing the address we want to delete
+     * @throws IllegalArgumentException if no fire station is found with the given address
      */
     public void delete(String inputAddress) {
+        logger.debug("Deleting fire station with address: {}", inputAddress);
         for (FireStation firesStation : fireStations) {
             if(firesStation.getAddress().equals(inputAddress)) {
                 fireStations.remove(firesStation);
                 updateFireStationsList(fireStations);
+                logger.info("Fire station with address {} deleted successfully.", inputAddress);
                 return;
             }
         }
@@ -107,16 +127,19 @@ public class FireStationRepository {
     }
 
     /**
-     * Update a given fireStation with the new data
+     * Update an existing fire station with the new data and update the JSON file
      *
      * @param inputFireStation a FireStation with updated data
      * @return the updated FireStation
+     * @throws IllegalArgumentException if no fire station is found with the given address
      */
     public FireStation update(FireStation inputFireStation) {
+        logger.debug("Updating fire station: {}", inputFireStation);
         for (FireStation firesStation : fireStations) {
             if(firesStation.getAddress().equals(inputFireStation.getAddress())) {
                 fireStations.set(fireStations.indexOf(firesStation), inputFireStation);
                 updateFireStationsList(fireStations);
+                logger.info("Fire station updated successfully: {}", inputFireStation);
                 return inputFireStation;
             }
         }
@@ -126,12 +149,14 @@ public class FireStationRepository {
     /**
      * Turn the FireStation list into a JsonNode in order to write in the JSON file as values for the key "firestations"
      *
-     * @param fireStations the list of fireStations with new datas to write to the JSON File
+     * @param fireStations the list of fireStations with new data to write to the JSON File
      */
     public void updateFireStationsList(List<FireStation> fireStations) {
+        logger.debug("Updating fire stations list in the JSON file.");
         ObjectNode rootNode = (ObjectNode) dataRepository.getData();
         ObjectMapper objectMapper = new ObjectMapper();
         rootNode.set("firestations", objectMapper.valueToTree(fireStations));
         dataRepository.writeData(rootNode);
+        logger.info("Fire stations list updated successfully.");
     }
 }
