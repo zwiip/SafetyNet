@@ -16,7 +16,7 @@ import java.util.List;
 public class MedicalRecordRepository {
 
     /* VARIABLES */
-    private static final Logger logger = LoggerFactory.getLogger(FireStationRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(MedicalRecordRepository.class);
     List<MedicalRecord> medicalRecords;
     private final DataRepository dataRepository;
 

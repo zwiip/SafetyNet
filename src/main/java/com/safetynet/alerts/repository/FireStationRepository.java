@@ -29,9 +29,9 @@ public class FireStationRepository {
     /* METHODS */
 
     /**
-     * Take a JsonNode and fetch the values for the key "fireStations" in order to create a list of FireStations
+     * Take a JsonNode and fetch the values for the key "firestations" in order to create a list of FireStations
      *
-     * @throws RuntimeException if an error occur while creating the list
+     * @throws RuntimeException if an error occurs while creating the list
      */
     public void createListFireStations() {
         try {
@@ -94,7 +94,7 @@ public class FireStationRepository {
     }
 
     /**
-     * Add a new fireStation to the list and update the JSON file.
+     * Add a new fire station to the list and update the JSON file.
      *
      * @param fireStation a new Fire Station to add
      * @return the added fire station
@@ -129,7 +129,7 @@ public class FireStationRepository {
     /**
      * Update an existing fire station with the new data and update the JSON file
      *
-     * @param inputFireStation a FireStation with updated data
+     * @param inputFireStation a Fire Station with updated data
      * @return the updated FireStation
      * @throws IllegalArgumentException if no fire station is found with the given address
      */
@@ -147,9 +147,9 @@ public class FireStationRepository {
     }
 
     /**
-     * Turn the FireStation list into a JsonNode in order to write in the JSON file as values for the key "firestations"
+     * Turn the Fire Station list into a JsonNode object in order to write in the JSON file as values for the key "firestations"
      *
-     * @param fireStations the list of fireStations with new data to write to the JSON File
+     * @param fireStations the list of fire stations with new data to write to the JSON File
      */
     public void updateFireStationsList(List<FireStation> fireStations) {
         logger.debug("Updating fire stations list in the JSON file.");
