@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -97,17 +96,11 @@ public class FireStationService {
      * @param address a String representing the address to check.
      * @return a PersonsListInCaseOfFireDTO object containing station number and persons details.
      */
-    public PersonsListInCaseOfFireDTO createPersonsAtThisAddressList(String address) {
+    public PersonsListInCaseOfFireDTO createPersonsListInCaseOfFire(String address) {
         logger.debug("Creating list of {} persons at the address {}", personService.getPersonsByAddress(address).size(), address);
         String stationNumber = fireStationRepository.getStationNumber(address);
-        ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
-        for ( Person person : personService.getPersonsByAddress(address)) {
-            long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
-            MedicalRecord medicalRecord = medicalRecordService.getOneMedicalRecord(person.getFirstName(), person.getLastName());
-            MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
-            personsAtThisAddressList.add(new PersonAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
-        }
-        logger.info("A list of {} persons at the address {}, covered by fire station {} has been created", personsAtThisAddressList.size(), address, stationNumber);
+        ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = createPersonsAtThisAddressList(address);
+        logger.info("A list of {} persons at the address {} in case of fire, covered by fire station {} has been created", personsAtThisAddressList.size(), address, stationNumber);
         return new PersonsListInCaseOfFireDTO(stationNumber, personsAtThisAddressList);
     }
 
@@ -121,28 +114,33 @@ public class FireStationService {
         List<FloodAlertDTO> floodAlertList = new ArrayList<>();
         for (String station : stations) {
             for (String address : fireStationRepository.getCoveredAddresses(station)) {
-                ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
-                for ( Person person : personService.getPersonsByAddress(address)) {
-                    long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
-                    MedicalRecord medicalRecord = medicalRecordService.getOneMedicalRecord(person.getFirstName(), person.getLastName());
-                    MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
-                    personsAtThisAddressList.add(new PersonAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
-                }
+                ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = createPersonsAtThisAddressList(address);
                 floodAlertList.add(new FloodAlertDTO(address, personsAtThisAddressList));
             }
-
         }
         logger.info("Flood alert list created for stations {}, with {} addresses covered", stations, floodAlertList.size());
         return floodAlertList;
+    }
+
+    public ArrayList<PersonAtThisAddressDTO> createPersonsAtThisAddressList(String address) {
+        logger.debug("Creating persons list at the address {}", address);
+        ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
+        for ( Person person : personService.getPersonsByAddress(address)) {
+            long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
+            MedicalRecord medicalRecord = medicalRecordService.getOneMedicalRecord(person.getFirstName(), person.getLastName());
+            MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
+            personsAtThisAddressList.add(new PersonAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
+        }
+        logger.info("Persons list created for address {}", address);
+        return personsAtThisAddressList;
     }
 
     /**
      * Creates a new fire station.
      * @param fireStation the FireStation object to create.
      * @return the created FireStation object.
-     * @throws IOException if an I/O error occurs.
      */
-    public FireStation createFireStation(FireStation fireStation) throws IOException {
+    public FireStation createFireStation(FireStation fireStation) {
         logger.debug("adding new fire station {}", fireStation);
         return fireStationRepository.save(fireStation);
     }
@@ -150,9 +148,8 @@ public class FireStationService {
     /**
      * Deletes a fire station by its address.
      * @param address a string representing the address of the fire station to delete.
-     * @throws IOException if an I/O error occurs.
      */
-    public void deleteFireStation(String address) throws IOException {
+    public void deleteFireStation(String address) {
         logger.debug("Deleting fire station at the address: {}", address);
         fireStationRepository.delete(address);
     }
