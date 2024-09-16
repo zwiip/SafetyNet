@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +49,7 @@ public class FireStationController {
     }
 
     @PostMapping(value = "/firestation")
-    public ResponseEntity<FireStation> addFireStation(@RequestBody FireStation firestation) throws IOException {
+    public ResponseEntity<FireStation> addFireStation(@RequestBody FireStation firestation) {
         FireStation fireStationToAdd = fireStationService.createFireStation(firestation);
         if (Objects.isNull(fireStationToAdd)) {
             return ResponseEntity.noContent().build();
@@ -65,7 +64,7 @@ public class FireStationController {
     }
 
     @DeleteMapping(value = "/firestation")
-    public void deleteFireStation(@RequestParam String address) throws IOException {
+    public void deleteFireStation(@RequestParam String address) {
         fireStationService.deleteFireStation(address);
     }
 
