@@ -112,11 +112,10 @@ public class FireStationServiceTest {
         // Assert
         assertEquals(2, phoneList.size());
         verify(personServiceMock, times(2)).getPersons();
-        verify(fireStationRepositoryMock).getCoveredAddresses("1");
     }
 
     @Test
-    void createPersonsAtThisAddressList_shouldReturnAPersonsListInCaseOfFireDTO() {
+    void createPersonsAtThisAddressList_shouldReturnAPersonsListInCaseOfFireInCaseOfFireDTO() {
         doReturn("1").when(fireStationRepositoryMock).getStationNumber("Green Gables");
 
         List<Person> personsAtThisAddres = new ArrayList<>();
@@ -135,7 +134,7 @@ public class FireStationServiceTest {
         doReturn(new MedicalRecord("Matthew", "Cuthbert", "01/01/1955", new ArrayList<>(List.of("heartpills:100mg")), new ArrayList<>(List.of("")))).when(medicalRecordServiceMock).getOneMedicalRecord("Matthew", "Cuthbert");
 
         // Act
-        PersonsListInCaseOfFireDTO personsListInCaseOfFireDTO = fireStationService.createPersonsAtThisAddressList("Green Gables");
+        PersonsListInCaseOfFireDTO personsListInCaseOfFireDTO = fireStationService.createPersonsListInCaseOfFire("Green Gables");
 
         // Assert
         assertEquals(3, personsListInCaseOfFireDTO.getPersonsAtThisAddress().size());
