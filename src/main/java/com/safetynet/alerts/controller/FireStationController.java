@@ -41,7 +41,7 @@ public class FireStationController {
 
     @GetMapping("/fire")
     public PersonsListInCaseOfFireDTO getPersonsAtThisAddress(@RequestParam String address) {
-        return fireStationService.createPersonsAtThisAddressList(address);
+        return fireStationService.createPersonsListInCaseOfFire(address);
     }
 
     @GetMapping("/flood/stations")
