@@ -34,7 +34,7 @@ class DataRepositoryTest {
     }
 
     @Test
-    void getData_shouldReturnJsonNode_whenFileIsValid() throws IOException {
+    void getData_shouldReturnJsonNode_whenFileIsValid() {
         // Act
         JsonNode result = dataRepository.getData();
 
@@ -54,7 +54,7 @@ class DataRepositoryTest {
     }
 
     @Test
-    void writeData_shouldWriteCorrectDataToFile() throws IOException {
+    void writeData_shouldWriteCorrectDataToFile() {
         // Arrange
         List<FireStation> newFireStations = new ArrayList<>();
         newFireStations.add(new FireStation("Cherry Valley", "1"));
@@ -75,8 +75,6 @@ class DataRepositoryTest {
         assertEquals(3, updatedFireStations.size());
         assertEquals("Cherry Valley", updatedFireStations.get(0).get("address").asText());
         assertEquals("2", updatedFireStations.get(1).get("station").asText());
-
     }
-
 
 }
