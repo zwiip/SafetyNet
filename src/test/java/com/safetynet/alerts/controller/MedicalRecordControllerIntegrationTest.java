@@ -1,5 +1,6 @@
 package com.safetynet.alerts.controller;
 
+import com.safetynet.alerts.repository.MedicalRecordRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,16 @@ public class MedicalRecordControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private MedicalRecordRepository medicalRecordRepository;
+
     @AfterEach
     public void restoreOriginalData() throws IOException {
         Files.copy(Paths.get("./src/main/resources/originalData.json"),
                 Paths.get("./src/main/resources/data.json"),
                 StandardCopyOption.REPLACE_EXISTING);
+
+        medicalRecordRepository.createListMedicalRecords();
     }
 
     @Test

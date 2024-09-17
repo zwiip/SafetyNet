@@ -1,8 +1,7 @@
 package com.safetynet.alerts.controller;
 
-import com.safetynet.alerts.repository.DataRepository;
+import com.safetynet.alerts.repository.FireStationRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,20 +24,16 @@ public class FireStationControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @BeforeEach
-    public void setUpData() throws Exception {
-        Files.copy(Paths.get("./src/main/resources/originalData.json"),
-                Paths.get("./src/main/resources/data.json"),
-                StandardCopyOption.REPLACE_EXISTING);
-
-        DataRepository dataRepository = new DataRepository();
-    }
+    @Autowired
+    FireStationRepository fireStationRepository;
 
     @AfterEach
     public void restoreOriginalData() throws IOException {
         Files.copy(Paths.get("./src/main/resources/originalData.json"),
                 Paths.get("./src/main/resources/data.json"),
                 StandardCopyOption.REPLACE_EXISTING);
+
+        fireStationRepository.createListFireStations();
     }
 
     @Test
@@ -57,6 +52,7 @@ public class FireStationControllerIntegrationTest {
                 .andExpect(jsonPath("$.adultsCount").value(5))
                 .andExpect(jsonPath("$.childCount").value(1));
     }
+
 
     @Test
     public void getPhoneList_shouldReturnPhoneList() throws Exception {
@@ -79,7 +75,7 @@ public class FireStationControllerIntegrationTest {
         mockMvc.perform(get("/flood/stations")
                         .param("stations", "1,2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(5));
+                .andExpect(jsonPath("$.length()").value(6));
     }
 
     @Test

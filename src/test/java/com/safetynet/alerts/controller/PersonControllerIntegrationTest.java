@@ -1,7 +1,7 @@
 package com.safetynet.alerts.controller;
 
+import com.safetynet.alerts.repository.PersonRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,18 +24,16 @@ public class PersonControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        Files.copy(Paths.get("./src/main/resources/originalData.json"),
-                Paths.get("./src/main/resources/data.json"),
-                StandardCopyOption.REPLACE_EXISTING);
-    }
+    @Autowired
+    private PersonRepository personRepository;
 
     @AfterEach
     public void restoreOriginalData() throws IOException {
         Files.copy(Paths.get("./src/main/resources/originalData.json"),
                 Paths.get("./src/main/resources/data.json"),
                 StandardCopyOption.REPLACE_EXISTING);
+
+        personRepository.createListPersons();
     }
 
     @Test
