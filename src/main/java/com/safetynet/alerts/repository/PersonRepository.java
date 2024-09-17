@@ -183,7 +183,7 @@ public class PersonRepository {
                 persons.set(persons.indexOf(person), inputPerson);
                 updatePersonsList(persons);
                 logger.info("Person {} {} updated.", person.getFirstName(), person.getLastName());
-                return person;
+                return inputPerson;
             }
         }
         throw new IllegalArgumentException("Person not found: " + inputPerson.getFirstName() + " " + inputPerson.getLastName());
