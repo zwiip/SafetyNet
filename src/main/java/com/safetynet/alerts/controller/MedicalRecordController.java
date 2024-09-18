@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +27,7 @@ public class MedicalRecordController {
         return medicalRecordService.getMedicalRecords(); }
 
     @PostMapping(value = "/medicalrecord")
-    public ResponseEntity<MedicalRecord> addMedicalRecord(@RequestBody MedicalRecord medicalRecord) throws IOException {
+    public ResponseEntity<MedicalRecord> addMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
         MedicalRecord medicalRecordToAdd = medicalRecordService.createMedicalRecord(medicalRecord);
         if (Objects.isNull(medicalRecordToAdd)) {
             return ResponseEntity.noContent().build();
@@ -42,12 +41,12 @@ public class MedicalRecordController {
     }
 
     @DeleteMapping(value = "/medicalrecord")
-    public void deleteMedicalRecord(@RequestParam String firstname, @RequestParam String lastname) throws IOException {
-        medicalRecordService.deleteMedicalRecord(firstname, lastname);
+    public void deleteMedicalRecord(@RequestParam String first_name, @RequestParam String last_name) {
+        medicalRecordService.deleteMedicalRecord(first_name, last_name);
     }
 
     @PutMapping(value = "/medicalrecord")
-    public ResponseEntity<MedicalRecord> updateMedicalRecord(@RequestBody MedicalRecord medicalRecord) throws IOException {
+    public ResponseEntity<MedicalRecord> updateMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
         MedicalRecord medicalRecordToUpdate = medicalRecordService.updateMedicalRecord(medicalRecord);
         if (Objects.isNull(medicalRecordToUpdate)) {
             return ResponseEntity.noContent().build();

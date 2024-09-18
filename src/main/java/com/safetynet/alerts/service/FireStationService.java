@@ -1,6 +1,7 @@
 package com.safetynet.alerts.service;
 
 import com.safetynet.alerts.controller.dto.*;
+import com.safetynet.alerts.exceptions.EmptyResourceException;
 import com.safetynet.alerts.exceptions.ResourceAlreadyExistException;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.model.MedicalRecord;
@@ -38,17 +39,26 @@ public class FireStationService {
 
     /**
      * Retrieves the list of all fire stations.
+     *
      * @return a list of FireStation objects.
+     * @throws EmptyResourceException if the fire station list is empty.
      */
     public List<FireStation> getFireStations() {
         logger.debug("retrieving all fire stations");
-        return fireStationRepository.findAll();
+        List<FireStation> fireStations = fireStationRepository.findAll();
+        if (fireStations.isEmpty()) {
+            throw new EmptyResourceException("No fire stations found");
+        }
+        logger.debug("Retrieved {} fire stations", fireStations.size());
+        return fireStations;
     }
 
     /**
      * Create an object listing all persons whose address is covered by a fire station, grouped by adults and children.
+     *
      * @param stationNumber the String of the fire station's number.
      * @return a CoveredPersonsListDTO object containing adults and children counts and person details.
+     *
      */
     public CoveredPersonsListDTO createFireStationPersonsList(String stationNumber) {
         logger.debug("Creating list of persons covered by fire station {}", stationNumber);
@@ -67,12 +77,13 @@ public class FireStationService {
                 }
             }
         }
-        logger.info("Fire station {} covers {} adults and {} children", stationNumber, childCounter, adultsCounter);
+        logger.debug("Fire station {} covers {} adults and {} children", stationNumber, adultsCounter, childCounter);
         return new CoveredPersonsListDTO(childCounter, adultsCounter, fireStationPersonsList);
     }
 
     /**
      * Retrieves a list of phone numbers of persons covered by a given fire station.
+     *
      * @param firestationNumber the number of the fire station.
      * @return a set of phone numbers to avoid duplicates.
      */
@@ -88,17 +99,21 @@ public class FireStationService {
                 }
             }
         }
-        logger.info("Fire station {} covers {} phone", firestationNumber, phoneList.size());
+        if (phoneList.isEmpty()) {
+            throw new EmptyResourceException("No phones found for fire station " + firestationNumber);
+        }
+        logger.debug("Fire station {} covers {} phone", firestationNumber, phoneList.size());
         return phoneList;
     }
 
     /**
      * Creates a list of persons living at a specific address, including their medical records.
+     *
      * @param address a String representing the address to check.
      * @return a PersonsListInCaseOfFireDTO object containing station number and persons details.
      */
     public PersonsListInCaseOfFireDTO createPersonsListInCaseOfFire(String address) {
-        logger.debug("Creating list of {} persons at the address {}", personService.getPersonsByAddress(address).size(), address);
+        logger.debug("Creating list of persons at the address {}", address);
         String stationNumber = fireStationRepository.getStationNumber(address);
         ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = createPersonsAtThisAddressList(address);
         logger.info("A list of {} persons at the address {} in case of fire, covered by fire station {} has been created", personsAtThisAddressList.size(), address, stationNumber);
@@ -107,6 +122,7 @@ public class FireStationService {
 
     /**
      * Creates a list of persons covered by one or multiple fire stations for flood alerts.
+     *
      * @param stations a list of String representing station numbers.
      * @return a list of FloodAlertDTO object containing addresses, persons covered and theirs medical records.
      */
@@ -132,12 +148,13 @@ public class FireStationService {
             MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
             personsAtThisAddressList.add(new PersonAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
         }
-        logger.info("Persons list created for address {}", address);
+        logger.debug("Persons list created for address {}", address);
         return personsAtThisAddressList;
     }
 
     /**
      * Creates a new fire station.
+     *
      * @param fireStation the FireStation object to create.
      * @return the created FireStation object.
      */
@@ -154,6 +171,7 @@ public class FireStationService {
 
     /**
      * Deletes a fire station by its address.
+     *
      * @param address a string representing the address of the fire station to delete.
      */
     public boolean deleteFireStation(String address) {
@@ -163,6 +181,7 @@ public class FireStationService {
 
     /**
      * Updates a fire station's details.
+     *
      * @param fireStation the FireStation object to update.
      * @return the updated FireStation object.
      */

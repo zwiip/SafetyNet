@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.MedicalRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public class MedicalRecordRepository {
 
     /**
      * Take a JsonNode object and fetch the values for the key "medicalrecords"  in order to create a list of Medical Records
+     *
      * @throws RuntimeException if an error occurs while creating the list
      */
     public void createListMedicalRecords() {
@@ -46,7 +48,7 @@ public class MedicalRecordRepository {
     }
 
     /**
-     * Retrieves the list of all medical records
+     * Retrieves the list of all medical records.
      *
      * @return the list of medical records
      */
@@ -57,6 +59,7 @@ public class MedicalRecordRepository {
 
     /**
      * Browse through the medical records to find the one matching with the given first name and last name
+     *
      * @param firstName a string representing the first name of the person we are looking for
      * @param lastName a string representing the last name of the person we are looking for
      * @return the medical record or null if not found
@@ -65,7 +68,7 @@ public class MedicalRecordRepository {
         logger.debug("Finding medical record for {} {}", firstName, lastName);
         for (MedicalRecord medicalRecord : medicalRecords) {
             if(medicalRecord.getFirstName().equals(firstName) && medicalRecord.getLastName().equals(lastName)) {
-                logger.info("Found medical record for {} {}", firstName, lastName);
+                logger.debug("Found medical record for {} {}", firstName, lastName);
                 return medicalRecord;
             }
         }
@@ -80,18 +83,19 @@ public class MedicalRecordRepository {
      * @return the added medical record
      */
     public MedicalRecord save(MedicalRecord medicalRecord) {
-        logger.debug("Saving new medical record {}", medicalRecord);
+        logger.debug("Saving new medical record for {} {}", medicalRecord.getFirstName(), medicalRecord.getLastName());
         medicalRecords.add(medicalRecord);
         updateMedicalRecordsList(medicalRecords);
-        logger.info("Medical record saved successfully");
+        logger.info("Medical record saved successfully for {} {}", medicalRecord.getFirstName(), medicalRecord.getLastName());
         return medicalRecord;
     }
 
     /**
-     * Delete the medical record matching the given firstname and lastname
+     * Delete the medical record matching the given firstname and lastname.
      *
-     * @param firstName a string representing the first name of the person we are looking for
-     * @param lastName a string representing the last name of the person we are looking for
+     * @param firstName a string representing the first name of the person we are looking for.
+     * @param lastName a string representing the last name of the person we are looking for.
+     * @throws ResourceNotFoundException if the medical record isn't found.
      */
     public void delete(String firstName, String lastName) {
         logger.debug("Deleting medical record for {} {}", firstName, lastName);
@@ -100,11 +104,11 @@ public class MedicalRecordRepository {
                medicalRecord.getLastName().equals(lastName)) {
                 medicalRecords.remove(medicalRecord);
                 updateMedicalRecordsList(medicalRecords);
-                logger.info("Medical record deleted successfully");
+                logger.info("Medical record deleted successfully for {} {}", firstName, lastName);
                 return;
             }
         }
-        throw new IllegalArgumentException("MedicalRecord not found for: " + firstName + " " + lastName);
+        throw new ResourceNotFoundException("It seems there is no Medical Record for: " + firstName + " " + lastName);
     }
 
     /**
@@ -112,19 +116,20 @@ public class MedicalRecordRepository {
      *
      * @param inputMedicalRecord a medical record with updated data
      * @return the updated medical record
+     * @throws ResourceNotFoundException if the medical record isn't found.
      */
-    public MedicalRecord update(MedicalRecord inputMedicalRecord) {
-        logger.debug("Updating medical record {}", inputMedicalRecord);
+    public MedicalRecord update(MedicalRecord inputMedicalRecord) throws ResourceNotFoundException {
+        logger.debug("Updating medical record for {} {}", inputMedicalRecord.getFirstName(), inputMedicalRecord.getLastName());
         for (MedicalRecord medicalRecord : medicalRecords) {
             if(medicalRecord.getFirstName().equals(inputMedicalRecord.getFirstName()) &&
                medicalRecord.getLastName().equals(inputMedicalRecord.getLastName())) {
                 medicalRecords.set(medicalRecords.indexOf(medicalRecord), inputMedicalRecord);
                 updateMedicalRecordsList(medicalRecords);
-                logger.info("Medical record updated successfully");
+                logger.info("Medical record updated successfully for {} {}", inputMedicalRecord.getFirstName(), inputMedicalRecord.getLastName());
                 return inputMedicalRecord;
             }
         }
-        throw new IllegalArgumentException("MedicalRecord not found: " + inputMedicalRecord);
+        throw new ResourceNotFoundException("It seems there is no Medical Record for: " + inputMedicalRecord.getFirstName() + " " + inputMedicalRecord.getLastName());
     }
 
     /**
@@ -138,6 +143,6 @@ public class MedicalRecordRepository {
         ObjectMapper objectMapper = new ObjectMapper();
         rootNode.set("medicalrecords", objectMapper.valueToTree(medicalRecords));
         dataRepository.writeData(rootNode);
-        logger.info("Medical records updated successfully");
+        logger.info("Medical records updated successfully, now {} entries", medicalRecords.size());
     }
 }

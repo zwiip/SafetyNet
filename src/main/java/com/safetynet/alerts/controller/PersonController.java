@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -27,8 +26,8 @@ public class PersonController {
         return personService.getPersons();
     }
 
-    @GetMapping("/person/{firstname}/{lastname}")
-    public Person getOnePerson(@PathVariable("firstname") String firstName, @PathVariable("lastname") String lastName) {
+    @GetMapping("/person/{first_name}/{last_name}")
+    public Person getOnePerson(@PathVariable("first_name") String firstName, @PathVariable("last_name") String lastName) {
         return personService.getOnePerson(firstName, lastName);
     }
 
@@ -38,8 +37,8 @@ public class PersonController {
     }
 
     @GetMapping("/personInfolastName")
-        public List<PersonInfoLastNameDTO> getPersonInfoLastName(@RequestParam String lastName) {
-        return personService.getPersonsByLastName(lastName);
+        public List<PersonInfoLastNameDTO> getPersonInfoLastName(@RequestParam String last_name) {
+        return personService.getPersonsByLastName(last_name);
     }
 
     @GetMapping("/communityEmail")
@@ -48,7 +47,7 @@ public class PersonController {
     }
 
     @PostMapping(value="/person")
-    public ResponseEntity<Person> addOnePerson(@RequestBody Person person) throws IOException {
+    public ResponseEntity<Person> addOnePerson(@RequestBody Person person) {
         Person personAdded = personService.createPerson(person);
         if (Objects.isNull(personAdded)) {
             return ResponseEntity.noContent().build();
@@ -63,12 +62,12 @@ public class PersonController {
     }
 
     @DeleteMapping(value="/person")
-    public void deleteOnePerson(@RequestParam String firstname, @RequestParam String lastname) throws IOException {
-        personService.deleteOnePerson(firstname, lastname);
+    public void deleteOnePerson(@RequestParam String first_name, @RequestParam String last_name) {
+        personService.deleteOnePerson(first_name, last_name);
     }
 
     @PutMapping(value="/person")
-    public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) throws IOException {
+    public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) {
         Person personToUpdate = personService.updatePerson(person);
         if (Objects.isNull(personToUpdate)) {
             return ResponseEntity.noContent().build();

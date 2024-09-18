@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class PersonRepository {
@@ -29,7 +32,8 @@ public class PersonRepository {
     /* METHODS */
 
     /**
-     * Take a JsonNode and fetch the values for the key "persons" in order to create a list of Persons
+     * Creates a list of Person objects from the JSON file. It fetches the "persons" key in the JSON data,
+     *  parses it into a list of Person objects, validates the data by removing duplicates, and updates the list.
      *
      * @throws RuntimeException if an error occurs while creating the list
      */
@@ -38,13 +42,42 @@ public class PersonRepository {
             logger.debug("Creating persons list from the JSON file.");
             JsonNode data = dataRepository.getData();
             JsonNode personsNode = data.get("persons");
+
             ObjectMapper objectMapper = new ObjectMapper();
             TypeReference<List<Person>> typeReferenceList = new TypeReference<>() {};
-            this.persons = objectMapper.readValue(personsNode.traverse(), typeReferenceList);
-            logger.info("Persons list created.");
+            List<Person> personsData = objectMapper.readValue(personsNode.traverse(), typeReferenceList);
+
+            this.persons = validatePersonsData(personsData);
+            updatePersonsList(this.persons);
+            logger.debug("Persons list created, with {} persons.", persons.size());
         } catch (IOException e) {
             throw new RuntimeException("Error while creating Persons List", e);
         }
+    }
+
+    /**
+     * Validates the list of Persons by removing any duplicate entries.
+     * A duplicate is identified when two persons have the same first and last name.
+     * If duplicates are found, they are removed.
+     *
+     * @param persons the list of Person objects to validate.
+     * @return a new list of Person objects with duplicates removed.
+     */
+    public List<Person> validatePersonsData (List<Person> persons) {
+        Set<String> uniquePersons = new HashSet<>();
+        List<Person> filteredPersons = new ArrayList<>();
+
+        for (Person person : persons) {
+            String fullName = person.getFirstName() + " " + person.getLastName();
+            if (!uniquePersons.contains(fullName)) {
+                uniquePersons.add(fullName);
+                filteredPersons.add(person);
+            } else {
+                logger.warn("Duplicate person found and removed: {}", fullName);
+            }
+        }
+        logger.debug("Validation complete. Total persons after removing duplicates: {}", filteredPersons.size());
+        return filteredPersons;
     }
 
     /**
@@ -68,11 +101,11 @@ public class PersonRepository {
         logger.debug("Finding person named {} {}.", firstName, lastName);
         for (Person person : persons) {
             if(person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)) {
-                logger.info("Found person named {} {}.", firstName, lastName);
+                logger.debug("Found person named {} {}.", firstName, lastName);
                 return person;
             }
         }
-        logger.warn("No person named {} {} found.", firstName, lastName);
+        logger.warn("Person not found: {} {}.", firstName, lastName);
         return null;
     }
 
@@ -91,7 +124,7 @@ public class PersonRepository {
                 logger.debug("Adding {} {} to the list of persons named {}.", person.getFirstName(), person.getLastName(), lastName);
             }
         }
-        logger.info("Found {} persons named {}.", outputPersonsList.size(), lastName);
+        logger.debug("Found {} persons named {}.", outputPersonsList.size(), lastName);
         return outputPersonsList;
     }
 
@@ -110,7 +143,7 @@ public class PersonRepository {
                 logger.debug("Adding {} {} to the list of persons living at {}.", person.getFirstName(), person.getLastName(), address);
             }
         }
-        logger.info("Found {} persons living at {}.", outputPersonsList.size(), address);
+        logger.debug("Found {} persons living at {}.", outputPersonsList.size(), address);
         return outputPersonsList;
     }
 
@@ -129,7 +162,7 @@ public class PersonRepository {
                 logger.debug("Adding {} {} to the list of persons in {}.", person.getFirstName(), person.getLastName(), city);
             }
         }
-        logger.info("Found {} persons living in {}.", outputPersonsList.size(), city);
+        logger.debug("Found {} persons living in {}.", outputPersonsList.size(), city);
         return outputPersonsList;
     }
 
@@ -140,10 +173,10 @@ public class PersonRepository {
      * @return the added person
      */
     public Person save(Person person) {
-        logger.debug("Saving person {}.", person);
+        logger.debug("Saving person {} {}.", person.getFirstName(), person.getLastName());
         persons.add(person);
         updatePersonsList(persons);
-        logger.info("Person saved.");
+        logger.info("Person saved: {} {}", person.getFirstName(), person.getLastName());
         return person;
     }
 
@@ -154,18 +187,18 @@ public class PersonRepository {
      * @param lastName a String representing the last name of the person we want to delete.
      * @throws IllegalArgumentException if no person matching the inputs is found.
      */
-    public void delete(String firstName, String lastName) {
+    public void delete(String firstName, String lastName) throws ResourceNotFoundException {
         logger.debug("Deleting person named {} {}.", firstName, lastName);
         for (Person person : persons) {
             if(person.getFirstName().equals(firstName) &&
                person.getLastName().equals(lastName)) {
                 persons.remove(person);
                 updatePersonsList(persons);
-                logger.info("Person {} {} deleted.", person.getFirstName(), person.getLastName());
+                logger.info("{} {} deleted.", person.getFirstName(), person.getLastName());
                 return;
             }
         }
-        throw new IllegalArgumentException("Person not found: " + firstName + " " + lastName);
+        throw new ResourceNotFoundException("Person not found: " + firstName + " " + lastName);
     }
 
     /**
@@ -186,7 +219,7 @@ public class PersonRepository {
                 return inputPerson;
             }
         }
-        throw new IllegalArgumentException("Person not found: " + inputPerson.getFirstName() + " " + inputPerson.getLastName());
+        throw new ResourceNotFoundException("Person not found: " + inputPerson.getFirstName() + " " + inputPerson.getLastName());
     }
 
     /**
@@ -200,6 +233,6 @@ public class PersonRepository {
         ObjectMapper objectMapper = new ObjectMapper();
         rootNode.set("persons", objectMapper.valueToTree(persons));
         dataRepository.writeData(rootNode);
-        logger.info("Persons list updated.");
+        logger.info("Persons list updated, now {} persons.", persons.size());
     }
 }

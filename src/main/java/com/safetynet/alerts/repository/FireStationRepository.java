@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.FireStation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class FireStationRepository {
             JsonNode fireStationsNode = data.get("firestations");
             TypeReference<List<FireStation>> typeReferenceList = new TypeReference<>() {};
             this.fireStations = new ObjectMapper().readValue(fireStationsNode.traverse(), typeReferenceList);
-            logger.info("Successfully created fire stations list.");
+            logger.info("Successfully created fire stations list with {} fire stations.", fireStations.size());
         } catch (IOException e) {
             throw new RuntimeException("Error while creating FireStations List", e);
         }
@@ -57,29 +58,33 @@ public class FireStationRepository {
     }
 
     /**
-     * Browse through the fire stations to create a list of addresses covered by the given station number
+     * Browse through the fire stations to create a list of addresses covered by the given station number.
      *
-     * @param stationNumber a String representing the number of the fire station
-     * @return a List of String with the addresses covered by the fire station
+     * @param stationNumber a String representing the number of the fire station.
+     * @return a List of String with the addresses covered by the fire station.
+     * @throws ResourceNotFoundException if there is no addresses matching the station number.
      */
     public ArrayList<String> getCoveredAddresses(String stationNumber) {
         logger.debug("Fetching addresses covered by station number: {}", stationNumber);
         ArrayList<String> coveredAddresses = new ArrayList<>();
-
         for(FireStation firesStation : findAll()) {
             if(firesStation.getStation().equals(stationNumber)) {
                 coveredAddresses.add(firesStation.getAddress());
             }
         }
-        logger.info("Found {} addresses covered by station number: {}", coveredAddresses.size(), stationNumber);
+        logger.debug("Found {} addresses covered by station number: {}", coveredAddresses.size(), stationNumber);
+        if(coveredAddresses.isEmpty()) {
+            throw new ResourceNotFoundException("No addresses found for given station number: " + stationNumber);
+        }
         return coveredAddresses;
     }
 
     /**
-     * Browse through the fire stations looking for the number of the station covering the given address
+     * Browse through the fire stations looking for the number of the station covering the given address.
      *
-     * @param address a String of an address
-     * @return a String representing the number of the fire station covering this address
+     * @param address a String of an address.
+     * @return a String representing the number of the fire station covering this address.
+     * @throws ResourceNotFoundException if the address doesn't match any station number.
      */
     public String getStationNumber(String address) {
         logger.debug("Fetching station number for address: {}", address);
@@ -89,15 +94,14 @@ public class FireStationRepository {
                 return firesStation.getStation();
             }
         }
-        logger.warn("No station number found for address: {}", address);
-        return null;
+        throw new ResourceNotFoundException("No station number found matching the address: " + address);
     }
 
     /**
      * Add a new fire station to the list and update the JSON file.
      *
-     * @param fireStation a new Fire Station to add
-     * @return the added fire station
+     * @param fireStation a new Fire Station to add.
+     * @return the added fire station.
      */
     public FireStation save(FireStation fireStation) {
         logger.debug("Saving new fire station: {}", fireStation);
@@ -113,17 +117,17 @@ public class FireStationRepository {
      * @param inputAddress a String representing the address we want to delete
      * @throws IllegalArgumentException if no fire station is found with the given address
      */
-    public void delete(String inputAddress) {
+    public boolean delete(String inputAddress) {
         logger.debug("Deleting fire station with address: {}", inputAddress);
         for (FireStation firesStation : fireStations) {
             if(firesStation.getAddress().equals(inputAddress)) {
                 fireStations.remove(firesStation);
                 updateFireStationsList(fireStations);
                 logger.info("Fire station with address {} deleted successfully.", inputAddress);
-                return;
+                return true;
             }
         }
-        throw new IllegalArgumentException("FireStation not found: " + inputAddress);
+        throw new ResourceNotFoundException("FireStation not found: " + inputAddress);
     }
 
     /**
@@ -143,7 +147,7 @@ public class FireStationRepository {
                 return inputFireStation;
             }
         }
-        throw new IllegalArgumentException("FireStation not found: " + inputFireStation);
+        throw new ResourceNotFoundException("FireStation not found: " + inputFireStation);
     }
 
     /**

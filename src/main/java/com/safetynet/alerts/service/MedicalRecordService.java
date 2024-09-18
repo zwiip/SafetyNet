@@ -1,5 +1,8 @@
 package com.safetynet.alerts.service;
 
+import com.safetynet.alerts.exceptions.EmptyResourceException;
+import com.safetynet.alerts.exceptions.ResourceAlreadyExistException;
+import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.repository.MedicalRecordRepository;
 import org.slf4j.Logger;
@@ -29,27 +32,42 @@ public class MedicalRecordService {
     /* METHODS */
 
     /**
-     * Retrieves the list of all Medical Records.
+     * Interacts with the repository layer to retrieve the list of all Medical Records.
+     *
      * @return a list of MedicalRecord object.
+     * @throws EmptyResourceException if the list of medical records is empty.
      */
     public List<MedicalRecord> getMedicalRecords() {
         logger.debug("Retrieving all medical records");
-        return medicalRecordRepository.findAll();
+        List<MedicalRecord> medicalRecords = medicalRecordRepository.findAll();
+        if (medicalRecords.isEmpty()) {
+            throw new EmptyResourceException("No medical records found");
+        }
+        logger.debug("Retrieved {} medical records", medicalRecords.size());
+        return medicalRecords;
     }
 
     /**
-     * Retrieve the medical record matching with the given first name and last name.
+     * Interacts with the repository layer to retrieve the medical record matching with the given first name and last name.
+     *
      * @param firstName a String representing the first name of the person.
      * @param lastName a String representing the last name of the person.
      * @return a MedicalRecord object matching the given first name and last name.
+     * @throws ResourceNotFoundException if no medical record is matching the inputs.
      */
     public MedicalRecord getOneMedicalRecord(String firstName, String lastName) {
         logger.debug("Retrieving medical record for {} {}", firstName, lastName);
-        return medicalRecordRepository.findMedicalRecordsByFullName(firstName, lastName);
+        MedicalRecord medicalRecord = medicalRecordRepository.findMedicalRecordsByFullName(firstName, lastName);
+        if (medicalRecord == null) {
+            throw new ResourceNotFoundException("No medical record found for " + firstName + " " + lastName);
+        }
+        logger.debug("Retrieved medical record for {} {}", firstName, lastName);
+        return medicalRecord;
     }
 
     /**
-     * Calculates the age of a person matching the given first and last name.
+     * Helper method to calculate the age of a person matching the given first and last name.
+     *
      * @param firstName a String representing the first name of the person.
      * @param lastName a String representing the last name of the person.
      * @return long of the age of the person in years.
@@ -65,7 +83,7 @@ public class MedicalRecordService {
             Date today = new Date();
             long diffInMillies = Math.abs(today.getTime() - birthday.getTime());
             long age = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS)/365;
-            logger.info("Calculated age for {} {}: {} years", firstName, lastName, age);
+            logger.debug("Calculated age for {} {}: {} years", firstName, lastName, age);
             return age;
 
         } catch (ParseException e) {
@@ -74,7 +92,8 @@ public class MedicalRecordService {
     }
 
     /**
-     * Determines if the person, matching the given inputs, is a child (18 years or younger).
+     * Helper method to determine if the person, matching the given inputs, is a child (18 years or younger).
+     *
      * @param firstName a String representing the first name of the person.
      * @param lastName a String representing the last name of the person.
      * @return true if the person is 18 years old or younger, false otherwise.
@@ -85,17 +104,28 @@ public class MedicalRecordService {
     }
 
     /**
-     * Creates a new medical Record.
-     * @param medicalRecord the MedicalRecord object to create.
+     * This method interacts with the repository layer to creates a new medical Record.
+     * First it checks if the Medical Record already exists.
+     *
+     * @param inputMedicalRecord the MedicalRecord object to create.
      * @return the created MedicalRecord object.
+     * @throws ResourceAlreadyExistException if we find a Medical Record with the same full name than the one to create.
      */
-    public MedicalRecord createMedicalRecord(MedicalRecord medicalRecord) {
-        logger.debug("Creating medical record {}", medicalRecord);
-        return medicalRecordRepository.save(medicalRecord);
+    public MedicalRecord createMedicalRecord(MedicalRecord inputMedicalRecord) throws ResourceAlreadyExistException {
+        logger.debug("Creating medical record for {} {}", inputMedicalRecord.getFirstName(), inputMedicalRecord.getLastName());
+        String inputMedicalRecordFirstName = inputMedicalRecord.getFirstName();
+        String inputMedicalRecordLastName = inputMedicalRecord.getLastName();
+        for (MedicalRecord medicalRecord : getMedicalRecords()) {
+            if (medicalRecord.getFirstName().equals(inputMedicalRecordFirstName) && medicalRecord.getLastName().equals(inputMedicalRecordLastName)) {
+                throw new ResourceAlreadyExistException("This Medical record already exist " + inputMedicalRecordFirstName + " " + inputMedicalRecordLastName);
+            }
+        }
+        return medicalRecordRepository.save(inputMedicalRecord);
     }
 
     /**
      * Deletes the medical record matching the inputs.
+     *
      * @param firstName a String representing the first name of the person.
      * @param lastName a String representing the last name of the person.
      */
