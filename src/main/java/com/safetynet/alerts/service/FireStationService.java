@@ -1,6 +1,7 @@
 package com.safetynet.alerts.service;
 
 import com.safetynet.alerts.controller.dto.*;
+import com.safetynet.alerts.exceptions.ResourceAlreadyExistException;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
@@ -140,8 +141,14 @@ public class FireStationService {
      * @param fireStation the FireStation object to create.
      * @return the created FireStation object.
      */
-    public FireStation createFireStation(FireStation fireStation) {
+    public FireStation createFireStation(FireStation fireStation) throws ResourceAlreadyExistException {
         logger.debug("adding new fire station {}", fireStation);
+        String address = fireStation.getAddress();
+        for (FireStation station : getFireStations()) {
+            if (station.getAddress().equals(address)) {
+                throw new ResourceAlreadyExistException("This address already exist with station number " + fireStation.getStation() + ". If you want to change it, please use an update operation.");
+            }
+        }
         return fireStationRepository.save(fireStation);
     }
 
@@ -149,9 +156,9 @@ public class FireStationService {
      * Deletes a fire station by its address.
      * @param address a string representing the address of the fire station to delete.
      */
-    public void deleteFireStation(String address) {
+    public boolean deleteFireStation(String address) {
         logger.debug("Deleting fire station at the address: {}", address);
-        fireStationRepository.delete(address);
+        return fireStationRepository.delete(address);
     }
 
     /**
