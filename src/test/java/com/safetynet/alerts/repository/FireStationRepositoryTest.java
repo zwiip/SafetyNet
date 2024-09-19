@@ -3,7 +3,6 @@ package com.safetynet.alerts.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.FireStation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,7 @@ public class FireStationRepositoryTest {
         repository = new FireStationRepository(dataRepositoryMock);
         JsonNode firestationsNode = jsonNode.get("firestations");
 
-        TypeReference<List<FireStation>> typeReferenceList = new TypeReference<List<FireStation>>() {};
+        TypeReference<List<FireStation>> typeReferenceList = new TypeReference<>() {};
         repository.fireStations = objectMapper.readValue(firestationsNode.traverse(), typeReferenceList);
     }
 
@@ -44,8 +43,8 @@ public class FireStationRepositoryTest {
 
         // Assert
         assertEquals(3, actualFireStations.size());
-        assertEquals("Green Gables", actualFireStations.get(0).getAddress());
-        assertEquals("1", actualFireStations.get(0).getStation());
+        assertEquals("Green Gables", actualFireStations.getFirst().getAddress());
+        assertEquals("1", actualFireStations.getFirst().getStation());
     }
 
     @Test
@@ -68,7 +67,7 @@ public class FireStationRepositoryTest {
     }
 
     @Test
-    void save_shouldAddFireStationToRepository() throws IOException {
+    void save_shouldAddFireStationToRepository() {
         // Arrange
         FireStation newFireStation = new FireStation("New Address", "3");
 
@@ -82,7 +81,7 @@ public class FireStationRepositoryTest {
     }
 
     @Test
-    void delete_shouldRemoveFireStationFromRepository() throws IOException {
+    void delete_shouldRemoveFireStationFromRepository() {
         // Arrange
         FireStation fireStationToDelete = new FireStation("Green Gables", "1");
 
@@ -106,7 +105,7 @@ public class FireStationRepositoryTest {
         // Assert
         List<FireStation> fireStations = repository.fireStations;
         assertEquals(3, fireStations.size());
-        assertEquals("3", fireStations.get(0).getStation());
+        assertEquals("3", fireStations.getFirst().getStation());
     }
 
 
