@@ -124,7 +124,6 @@ public class FireStationController {
     /**
      * Add a new fire station to the database.
      * Accepts a JSON object representing a fire station and adds it to the list.
-     *
      * Example usage:
      * POST /firestation
      * Body: {
@@ -169,14 +168,14 @@ public class FireStationController {
             logger.warn("Failed to delete the fire station for the address: {}", address);
             return ResponseEntity.notFound().build();
         }
-            logger.info("Successfully deleted the fire station for the address: {}", address);
-            return ResponseEntity.ok().build();
+        logger.info("Successfully deleted the fire station for the address: {}", address);
+        return ResponseEntity.ok().build();
     }
 
     /**
      * Updates an existing fire station with new values.
      *
-     * @param fireStation a String representing the FireStation object with updated details.
+     * @param fireStation a json of the FireStation object with updated details in the body of the request.
      * @return a response entity with the updated fire station:
      *         200
      */
