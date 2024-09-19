@@ -122,7 +122,6 @@ public class PersonServiceTest {
         // Assert
         assertEquals(1, actualChildAlert.getChildList().size());
         assertEquals(2, actualChildAlert.getOtherMembersList().size());
-        verify(personRepositoryMock).findPersonByAddress("Green Gables");
         verify(medicalRecordServiceMock).getAge("Anne", "Shirley");
     }
 

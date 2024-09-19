@@ -88,8 +88,8 @@ public class MedicalRecordControllerIntegrationTest {
     @Test
     public void deleteMedicalRecord_shouldReturnStatusOk() throws Exception {
         mockMvc.perform(delete("/medicalrecord")
-                        .param("firstname", "John")
-                        .param("lastname", "Boyd"))
+                        .param("first_name", "John")
+                        .param("last_name", "Boyd"))
                 .andExpect(status().isOk());
     }
 }

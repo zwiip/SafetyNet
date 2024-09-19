@@ -47,7 +47,7 @@ public class FireStationControllerIntegrationTest {
     @Test
     public void getFireStationPersonsList_shouldReturnCoveredPersons() throws Exception {
         mockMvc.perform(get("/firestation")
-                        .param("stationNumber", "1"))
+                        .param("station_number", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.adultsCount").value(5))
                 .andExpect(jsonPath("$.childCount").value(1));
@@ -57,7 +57,7 @@ public class FireStationControllerIntegrationTest {
     @Test
     public void getPhoneList_shouldReturnPhoneList() throws Exception {
         mockMvc.perform(get("/phoneAlert")
-                        .param("firestation", "2"))
+                        .param("fire_station", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(4));
     }

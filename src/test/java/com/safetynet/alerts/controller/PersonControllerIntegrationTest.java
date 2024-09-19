@@ -63,7 +63,7 @@ public class PersonControllerIntegrationTest {
     @Test
     public void getPersonInfoLastName_shouldReturnAListOfPersonInfoLastNameDTO() throws Exception {
         mockMvc.perform(get("/personInfolastName")
-                        .param("lastName", "Stelzer"))
+                        .param("last_name", "Stelzer"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(3)))
                 .andExpect(jsonPath("$[0].address", is("947 E. Rose Dr")));
@@ -123,8 +123,8 @@ public class PersonControllerIntegrationTest {
     @Test
     public void deleteOnePerson_shouldDeleteThePerson() throws Exception {
         mockMvc.perform(delete("/person")
-                        .param("firstname", "Eric")
-                        .param("lastname", "Cadigan"))
+                        .param("first_name", "Eric")
+                        .param("last_name", "Cadigan"))
                 .andExpect(status().isOk());
     }
 }

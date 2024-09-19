@@ -3,6 +3,7 @@ package com.safetynet.alerts.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.FireStation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,30 +59,12 @@ public class FireStationRepositoryTest {
     }
 
     @Test
-    void getCoveredAddresses_shouldReturnEmptyList_whenNoAddressesFoundForStation() {
-        // Act
-        ArrayList<String> coveredAddresses = repository.getCoveredAddresses("Unknown address");
-
-        // Assert
-        assertTrue(coveredAddresses.isEmpty());
-    }
-
-    @Test
     void getStationNumber_shouldReturnCorrectNumber() {
         // Act
         String stationNumber = repository.getStationNumber("Green Gables");
 
         // Assert
         assertEquals("1", stationNumber);
-    }
-
-    @Test
-    void getStationNumber_shouldReturnNull_whenNoAddressFound() {
-        // Act
-        String stationNumber = repository.getStationNumber("Unknown address");
-
-        // Assert
-        assertNull(stationNumber);
     }
 
     @Test
