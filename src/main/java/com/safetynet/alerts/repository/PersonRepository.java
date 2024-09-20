@@ -187,7 +187,7 @@ public class PersonRepository {
      * @param lastName a String representing the last name of the person we want to delete.
      * @throws IllegalArgumentException if no person matching the inputs is found.
      */
-    public void delete(String firstName, String lastName) throws ResourceNotFoundException {
+    public boolean delete(String firstName, String lastName) throws ResourceNotFoundException {
         logger.debug("Deleting person named {} {}.", firstName, lastName);
         for (Person person : persons) {
             if(person.getFirstName().equals(firstName) &&
@@ -195,7 +195,7 @@ public class PersonRepository {
                 persons.remove(person);
                 updatePersonsList(persons);
                 logger.info("{} {} deleted.", person.getFirstName(), person.getLastName());
-                return;
+                return true;
             }
         }
         throw new ResourceNotFoundException("Person not found: " + firstName + " " + lastName);

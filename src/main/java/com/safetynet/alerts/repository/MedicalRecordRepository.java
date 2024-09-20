@@ -97,7 +97,7 @@ public class MedicalRecordRepository {
      * @param lastName a string representing the last name of the person we are looking for.
      * @throws ResourceNotFoundException if the medical record isn't found.
      */
-    public void delete(String firstName, String lastName) {
+    public boolean delete(String firstName, String lastName) {
         logger.debug("Deleting medical record for {} {}", firstName, lastName);
         for (MedicalRecord medicalRecord : medicalRecords) {
             if(medicalRecord.getFirstName().equals(firstName) &&
@@ -105,7 +105,7 @@ public class MedicalRecordRepository {
                 medicalRecords.remove(medicalRecord);
                 updateMedicalRecordsList(medicalRecords);
                 logger.info("Medical record deleted successfully for {} {}", firstName, lastName);
-                return;
+                return true;
             }
         }
         throw new ResourceNotFoundException("It seems there is no Medical Record for: " + firstName + " " + lastName);

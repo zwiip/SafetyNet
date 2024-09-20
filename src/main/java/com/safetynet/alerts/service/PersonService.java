@@ -178,9 +178,9 @@ public class PersonService {
      * @param firstName a String representing the first name of the person to delete.
      * @param lastName a String representing the last name of the person to delete.
      */
-    public void deleteOnePerson(String firstName, String lastName) {
+    public boolean deleteOnePerson(String firstName, String lastName) {
         logger.debug("Deleting {} {}", firstName, lastName);
-        personRepository.delete(firstName, lastName);
+        return personRepository.delete(firstName, lastName);
     }
 
     /**

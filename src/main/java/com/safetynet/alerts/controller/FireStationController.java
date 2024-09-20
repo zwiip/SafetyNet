@@ -35,8 +35,8 @@ public class FireStationController {
      * This endpoint is used to fetch a list of all fire stations.
      *
      * @return a list of fire stations in the system.
-     *         - 200 successful retrieval of the fire stations.
-     *         - 404 if no fire stations are found.
+     *         - 200 OK: successful retrieval of the fire stations.
+     *         - 404 NOT FOUND: if no fire stations are found.
      */
     @GetMapping("/firestations")
     public List<FireStation> getFireStations() {
@@ -51,6 +51,8 @@ public class FireStationController {
 
     /**
      * This endpoint returns detailed information about people covered by a specific fire station number.
+     * Example usage:
+     * GET /firestation?station_number=1
      *
      * @param station_number a String representing the fire station number for which the persons list is requested.
      * @return a CoveredPersonsListDTO object containing the list of persons whose address is covered by the fire station.
@@ -69,24 +71,28 @@ public class FireStationController {
 
     /**
      * This endpoint returns a list of phone numbers of persons whose address is covered by a specific fire station.
+     * Example usage:
+     * GET /phoneAlert?fire_station=2
      *
-     * @param fire_station a String representing the station number for which the phone list is requested.
+     * @param station_number a String representing the station number for which the phone list is requested.
      * @return a set of phone numbers for persons covered by the given fire station.
      */
     @GetMapping("/phoneAlert")
-    public Set<String> getPhoneList(@RequestParam String fire_station) {
-        logger.debug("Received request for phone numbers for fire station number: {}", fire_station);
-        Set<String> phoneList = fireStationService.createPhoneList(fire_station);
+    public Set<String> getPhoneList(@RequestParam String station_number) {
+        logger.debug("Received request for phone numbers for fire station number: {}", station_number);
+        Set<String> phoneList = fireStationService.createPhoneList(station_number);
         if(phoneList == null) {
-            logger.warn("No phone number found for fire station number: {}", fire_station);
+            logger.warn("No phone number found for fire station number: {}", station_number);
         } else {
-            logger.info("Returning {} phone numbers for fire station number: {}", phoneList.size() ,fire_station);
+            logger.info("Returning {} phone numbers for fire station number: {}", phoneList.size() ,station_number);
         }
         return phoneList;
     }
 
     /**
      * This endpoint returns a list of persons and their details for a specific address in case of fire.
+     * Example usage:
+     * GET /fire?address=1509 Culver St
      *
      * @param address the address for which the persons list is requested.
      * @return a PersonsListInCaseOfFireDTO object containing the persons list.
@@ -105,6 +111,8 @@ public class FireStationController {
 
     /**
      * This endpoint returns a list of persons by address in case of flood.
+     * Example usage:
+     * GET /flood/stations?stations=1,2
      *
      * @param stations a list of String representing the fire stations' numbers involved in the flood.
      * @return a List of FloodAlertDTO objects containing the address and list of persons living there.
@@ -122,19 +130,16 @@ public class FireStationController {
     }
 
     /**
-     * Add a new fire station to the database.
-     * Accepts a JSON object representing a fire station and adds it to the list.
+     * Adds a new fire station to the system.
+     * Accepts a JSON object representing a fire station and adds it to the list of fire stations.
      * Example usage:
      * POST /firestation
-     * Body: {
-     *   "address": "New Address",
-     *   "station": "3"
-     * }
+     * Body: {"address": "New Address", "station": "3"}
      *
      * @param fireStation a FireStation object in the body of the request representing the station to be added.
-     * @return a ResponseEntity with the created fire station + the result of the operation:
-     *         - 201 (Created) if the fire station was added successfully,
-     *         - 204 (No Content) if the fire station could not be added.
+     * @return a ResponseEntity with the HTTP Status:
+     *         - 201 CREATED: if the fire station was added successfully,
+     *         - 204 NO CONTENT: if the fire station could not be added.
      */
     @PostMapping(value = "/firestation")
     public ResponseEntity<FireStation> addFireStation(@RequestBody FireStation fireStation) {
@@ -154,12 +159,36 @@ public class FireStationController {
     }
 
     /**
+     * Updates an existing fire station with new values.
+     * Example usage:
+     * PUT /firestation
+     * Body: {"address": "New Address", "station": "1"}
+     *
+     * @param fireStation a json of the FireStation object with updated details in the body of the request.
+     * @return a response entity with the updated fire station:
+     *         - 200 OK: If the fire station has been updated.
+     *         - 404 NOT FOUND: If the fire station hasn't been updated.
+     */
+    @PutMapping(value = "/firestation")
+    public ResponseEntity<FireStation> updateFireStation(@RequestBody FireStation fireStation) {
+        FireStation fireStationToUpdate = fireStationService.updateFireStation(fireStation);
+        if (Objects.isNull(fireStationToUpdate)) {
+            logger.warn("Failed to update the fire station {}", fireStation);
+            return ResponseEntity.notFound().build();
+        }
+        logger.info("Successfully updated the fire station {}", fireStation);
+        return ResponseEntity.ok(fireStationToUpdate);
+    }
+
+    /**
      * Deletes a fire station matching the given address.
+     * Example usage:
+     * DELETE /firestation?address=New Address
      *
      * @param address a String representing the address of the fire station to be deleted.
      * @return ResponseEntity<Void> indicating the result of the operation:
-     *         200 OK: if the fire station has been successfully deleted,
-     *         400 Not Found: if the fire station hasn't been found.
+     *         - 200 OK: if the fire station has been successfully deleted,
+     *         - 404 NOT FOUND: if the fire station hasn't been found.
      */
     @DeleteMapping(value = "/firestation")
     public ResponseEntity<Void> deleteFireStation(@RequestParam String address) {
@@ -170,23 +199,5 @@ public class FireStationController {
         }
         logger.info("Successfully deleted the fire station for the address: {}", address);
         return ResponseEntity.ok().build();
-    }
-
-    /**
-     * Updates an existing fire station with new values.
-     *
-     * @param fireStation a json of the FireStation object with updated details in the body of the request.
-     * @return a response entity with the updated fire station:
-     *         200
-     */
-    @PutMapping(value = "/firestation")
-    public ResponseEntity<FireStation> updateFireStation(@RequestBody FireStation fireStation) {
-        FireStation fireStationToUpdate = fireStationService.updateFireStation(fireStation);
-        if (Objects.isNull(fireStationToUpdate)) {
-            logger.warn("Failed to update the fire station {}", fireStation);
-            return ResponseEntity.noContent().build();
-        }
-        logger.info("Successfully updated the fire station {}", fireStation);
-        return ResponseEntity.ok(fireStationToUpdate);
     }
 }

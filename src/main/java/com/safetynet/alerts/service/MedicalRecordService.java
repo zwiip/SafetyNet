@@ -129,9 +129,9 @@ public class MedicalRecordService {
      * @param firstName a String representing the first name of the person.
      * @param lastName a String representing the last name of the person.
      */
-    public void deleteMedicalRecord(String firstName, String lastName) {
+    public boolean deleteMedicalRecord(String firstName, String lastName) {
         logger.debug("Deleting medical record for {} {}", firstName, lastName);
-        medicalRecordRepository.delete(firstName, lastName);
+        return medicalRecordRepository.delete(firstName, lastName);
     }
 
     /**

@@ -68,7 +68,7 @@ public class PersonController {
     /**
      * This endpoint returns a list of child and adults and their details at a given address.
      * Example usage:
-     * GET /childAlert?address="221B Baker Street"
+     * GET /childAlert?address=221B Baker Street
      *
      * @param address a String representing.
      * @return a ChildAlertDTO object containing a list of child and a list of other members of the family living at the given address.
@@ -118,9 +118,9 @@ public class PersonController {
      * Body: {"firstName": "Anne", "lastName": "Shirley", "address": "Green Gables", "city": "Avonlea", "zip": "12345", "phone": "0123456789", "email": "anne.shirley@avonlea.com"}
      *
      * @param person a json of a person in the body of the request.
-     * @return a Response Entity with the created person and the result of the operation:
-     *         - 201 (Created) if the person has been successfully created,
-     *         - 204 (No content) if the person could not be added.
+     * @return a Response Entity with the HTTP status.
+     *         - 201 CREATED: if the person has been successfully created,
+     *         - 204 NO CONTENT: if the person could not be added.
      */
     @PostMapping(value="/person")
     public ResponseEntity<Person> addOnePerson(@RequestBody Person person) {
@@ -140,15 +140,35 @@ public class PersonController {
     }
 
     /**
-     * This endpoint delete a person from the system.
+     * Update an existing person from the system with new details.
+     * Example usage:
+     * PUT /person
+     * Body: {"firstName": "Anne", "lastName": "Shirley", "address": "Patty's House", "city": "Redmond", "zip": "54321", "phone": "0123456789", "email": "anne.shirley@redmond.com"}
+     *
+     * @param person a json of a person in the body of the request.
+     * @return a response entity with the updated person and the HTTP status:
+     *          - 200 OK: if the person has been successfully updated
+     *          - 404 NOT FOUND: if the person hasn't been updated.
+     */
+    @PutMapping(value="/person")
+    public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) {
+        Person personToUpdate = personService.updatePerson(person);
+        if (Objects.isNull(personToUpdate)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(personToUpdate);
+    }
+
+    /**
+     * This endpoint deletes a person from the system.
      * Example usage:
      * DELETE /person?first_name=Anne&last_name=Shirley
      *
      * @param first_name a String representing the person's first name, to add in the url
      * @param last_name a String representing the person's last name, to add in the url.
-     * @return ResponseEntity<Void> indicating the result of the operation:
-     *        200 OK: if the fire station has been successfully deleted,
-     *        400 Not Found: if the fire station hasn't been found.
+     * @return ResponseEntity<Void> indicating the HTTP status:
+     *        - 200 OK: if the person has been successfully deleted,
+     *        - 404 NOT FOUND: if the person hasn't been found.
      */
     @DeleteMapping(value="/person")
     public ResponseEntity<Void> deleteOnePerson(@RequestParam String first_name, @RequestParam String last_name) {
@@ -158,26 +178,5 @@ public class PersonController {
         }
         logger.info("Successfully deleted {} {}", first_name, last_name);
         return ResponseEntity.ok().build();
-    }
-
-    /**
-     * Update an existing person from the system with new details.
-     * Example usage:
-     * PUT /person
-     * Body: {"firstName": "Anne", "lastName": "Shirley", "address": "Green Gables", "city": "Redmond", "zip": "54321", "phone": "0123456789", "email": "anne.shirley@redmond.com"}
-     *
-     * @param person a json of a person in the body of the request.
-     * @return a response entity with the updated person and the http status:
-     *          200 OK: if the person has been successfully updated
-     *          204 No Content: if the
-     *          // TODO pourquoi no content ?
-     */
-    @PutMapping(value="/person")
-    public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) {
-        Person personToUpdate = personService.updatePerson(person);
-        if (Objects.isNull(personToUpdate)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(personToUpdate);
     }
 }
