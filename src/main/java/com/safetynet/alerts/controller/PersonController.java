@@ -73,7 +73,6 @@ public class PersonController {
      * @param address a String representing.
      * @return a ChildAlertDTO object containing a list of child and a list of other members of the family living at the given address.
      */
-    // TODO : demander pour l'utilité des if / else puisque les exceptions sont levées auparavant.
     @GetMapping("/childAlert")
     public ChildAlertDTO getChildAlertList(@RequestParam String address) {
         ChildAlertDTO childAlert = personService.createChildAlertList(address);
@@ -92,7 +91,7 @@ public class PersonController {
      * @param last_name a String representing the last name.
      * @return a list of PersonInfoLastNameDTO objects containing the list of the persons and their details.
      */
-    @GetMapping("/personInfolastName")
+    @GetMapping("/personInfo")
         public List<PersonInfoLastNameDTO> getPersonInfoLastName(@RequestParam String last_name) {
         return personService.getPersonsByLastName(last_name);
     }

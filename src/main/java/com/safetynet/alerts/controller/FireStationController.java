@@ -74,17 +74,17 @@ public class FireStationController {
      * Example usage:
      * GET /phoneAlert?fire_station=2
      *
-     * @param station_number a String representing the station number for which the phone list is requested.
+     * @param firestation_number a String representing the station number for which the phone list is requested.
      * @return a set of phone numbers for persons covered by the given fire station.
      */
     @GetMapping("/phoneAlert")
-    public Set<String> getPhoneList(@RequestParam String station_number) {
-        logger.debug("Received request for phone numbers for fire station number: {}", station_number);
-        Set<String> phoneList = fireStationService.createPhoneList(station_number);
+    public Set<String> getPhoneList(@RequestParam String firestation_number) {
+        logger.debug("Received request for phone numbers for fire station number: {}", firestation_number);
+        Set<String> phoneList = fireStationService.createPhoneList(firestation_number);
         if(phoneList == null) {
-            logger.warn("No phone number found for fire station number: {}", station_number);
+            logger.warn("No phone number found for fire station number: {}", firestation_number);
         } else {
-            logger.info("Returning {} phone numbers for fire station number: {}", phoneList.size() ,station_number);
+            logger.info("Returning {} phone numbers for fire station number: {}", phoneList.size() ,firestation_number);
         }
         return phoneList;
     }

@@ -62,7 +62,7 @@ public class PersonControllerIntegrationTest {
 
     @Test
     public void getPersonInfoLastName_shouldReturnAListOfPersonInfoLastNameDTO() throws Exception {
-        mockMvc.perform(get("/personInfolastName")
+        mockMvc.perform(get("/personInfo")
                         .param("last_name", "Stelzer"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(3)))

@@ -57,7 +57,7 @@ public class FireStationControllerIntegrationTest {
     @Test
     public void getPhoneList_shouldReturnPhoneList() throws Exception {
         mockMvc.perform(get("/phoneAlert")
-                        .param("station_number", "2"))
+                        .param("firestation_number", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(4));
     }
