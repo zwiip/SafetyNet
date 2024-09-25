@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class FireStationRepository {
@@ -39,12 +41,41 @@ public class FireStationRepository {
             logger.debug("Creating fire stations list from JSON file.");
             JsonNode data = dataRepository.getData();
             JsonNode fireStationsNode = data.get("firestations");
+
+            ObjectMapper objectMapper = new ObjectMapper();
             TypeReference<List<FireStation>> typeReferenceList = new TypeReference<>() {};
-            this.fireStations = new ObjectMapper().readValue(fireStationsNode.traverse(), typeReferenceList);
+            List<FireStation> fireStationsData = objectMapper.readValue(fireStationsNode.traverse(), typeReferenceList);
+
+            this.fireStations = validateFireStationsData(fireStationsData);
+            updateFireStationsList(this.fireStations);
             logger.info("Successfully created fire stations list with {} fire stations.", fireStations.size());
         } catch (IOException e) {
             throw new RuntimeException("Error while creating FireStations List", e);
         }
+    }
+
+    /**
+     * Validates the list of FireStations by removing any duplicate entries.
+     * A duplicate is identified when two firestations map have the same address.
+     * If duplicates are found, they are removed.
+     *
+     * @param fireStations the list of Firestation objects to validate.
+     * @return a new list of Firestation objects with duplicates removed.
+     */
+    public List<FireStation> validateFireStationsData(List<FireStation> fireStations) {
+        Set<String> uniqueAddresses = new HashSet<>();
+        List<FireStation> filteredFireStations = new ArrayList<>();
+
+        for (FireStation fireStation : fireStations) {
+            if (!uniqueAddresses.contains(fireStation.getAddress())) {
+                uniqueAddresses.add(fireStation.getAddress());
+                filteredFireStations.add(fireStation);
+            } else {
+                logger.warn("Duplicate fire station found and removed for address {}", fireStation.getAddress());
+            }
+        }
+        logger.debug("Validation complete. Total fire stations after removing duplicates: {}", filteredFireStations.size());
+        return filteredFireStations;
     }
 
     /**

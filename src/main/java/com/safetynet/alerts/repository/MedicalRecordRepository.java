@@ -4,14 +4,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.MedicalRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class MedicalRecordRepository {
@@ -39,12 +42,42 @@ public class MedicalRecordRepository {
             logger.debug("Creating medical records list from JSON file");
             JsonNode data = dataRepository.getData();
             JsonNode medicalRecordNode = data.get("medicalrecords");
+
+            ObjectMapper objectMapper = new ObjectMapper();
             TypeReference<List<MedicalRecord>> typeReferenceList = new TypeReference<>() {};
-            this.medicalRecords = new ObjectMapper().readValue(medicalRecordNode.traverse(), typeReferenceList);
-            logger.info("Medical records list created successfully");
+            List<MedicalRecord> medicalRecordsData = objectMapper.readValue(medicalRecordNode.traverse(), typeReferenceList);
+
+            this.medicalRecords = validateMedicalRecordsData(medicalRecordsData);
+            updateMedicalRecordsList(this.medicalRecords);
+            logger.info("Medical records list created successfully with {} medical records", medicalRecords.size());
         } catch (IOException e) {
             throw new RuntimeException("Error while creating MedicalRecords list", e);
         }
+    }
+
+    /**
+     * Validates the list of Medical Records by removing any duplicate entries.
+     * A duplicate is identified when two medical records have the same first and last name.
+     * If duplicates are found, they are removed.
+     *
+     * @param medicalRecords the list of MedicalRecord objects to validate.
+     * @return a new list of MedicalRecord objects with duplicates removed.
+     */
+    public List<MedicalRecord> validateMedicalRecordsData (List<MedicalRecord> medicalRecords) {
+        Set<String> uniqueMedicalRecord = new HashSet<>();
+        List<MedicalRecord> filteredMedicalRecords = new ArrayList<>();
+
+        for (MedicalRecord medicalRecord : medicalRecords) {
+            String fullName = medicalRecord.getFirstName() + " " + medicalRecord.getLastName();
+            if (!uniqueMedicalRecord.contains(fullName)) {
+                uniqueMedicalRecord.add(fullName);
+                filteredMedicalRecords.add(medicalRecord);
+            } else {
+                logger.warn("Duplicate medical record found and removed: {}", fullName);
+            }
+        }
+        logger.debug("Validation complete. Total medical records after removing duplicates: {}", filteredMedicalRecords.size());
+        return filteredMedicalRecords;
     }
 
     /**

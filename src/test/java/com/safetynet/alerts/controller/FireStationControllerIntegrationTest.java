@@ -40,7 +40,7 @@ public class FireStationControllerIntegrationTest {
     public void getFireStations_shouldReturnAllFireStations() throws Exception {
         mockMvc.perform(get("/firestations"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(13))
+                .andExpect(jsonPath("$.length()").value(11))
                 .andExpect(jsonPath("$[0].address", is("1509 Culver St")));
     }
 
