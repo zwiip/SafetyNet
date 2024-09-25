@@ -1,6 +1,5 @@
 package com.safetynet.alerts.service;
 
-import com.safetynet.alerts.exceptions.EmptyResourceException;
 import com.safetynet.alerts.exceptions.ResourceAlreadyExistException;
 import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.MedicalRecord;
@@ -30,19 +29,14 @@ public class MedicalRecordService {
     }
 
     /* METHODS */
-
     /**
      * Interacts with the repository layer to retrieve the list of all Medical Records.
      *
      * @return a list of MedicalRecord object.
-     * @throws EmptyResourceException if the list of medical records is empty.
      */
     public List<MedicalRecord> getMedicalRecords() {
         logger.debug("Retrieving all medical records");
         List<MedicalRecord> medicalRecords = medicalRecordRepository.findAll();
-        if (medicalRecords.isEmpty()) {
-            throw new EmptyResourceException("No medical records found");
-        }
         logger.debug("Retrieved {} medical records", medicalRecords.size());
         return medicalRecords;
     }
@@ -124,23 +118,34 @@ public class MedicalRecordService {
     }
 
     /**
+     * Updates an existing medical record.
+     *
+     * @param inputMedicalRecord the MedicalRecord object to update.
+     * @return the updated MedicalRecord object.
+     * @throws ResourceNotFoundException if the medical record is not found is the list.
+     */
+    public MedicalRecord updateMedicalRecord(MedicalRecord inputMedicalRecord) {
+        logger.debug("Updating medical record {}", inputMedicalRecord);
+        MedicalRecord medicalRecordToUpdate = getOneMedicalRecord(inputMedicalRecord.getFirstName(), inputMedicalRecord.getLastName());
+        if (medicalRecordToUpdate == null) {
+            throw new ResourceNotFoundException("No medical record found for " + inputMedicalRecord.getFirstName() + " "+ inputMedicalRecord.getLastName());
+        }
+        return medicalRecordRepository.update(inputMedicalRecord);
+    }
+
+    /**
      * Deletes the medical record matching the inputs.
      *
      * @param firstName a String representing the first name of the person.
      * @param lastName a String representing the last name of the person.
+     * @throws ResourceNotFoundException if the medical record is not found in the medical record list.
      */
-    public boolean deleteMedicalRecord(String firstName, String lastName) {
+    public void deleteMedicalRecord(String firstName, String lastName) {
         logger.debug("Deleting medical record for {} {}", firstName, lastName);
-        return medicalRecordRepository.delete(firstName, lastName);
-    }
-
-    /**
-     * Updates an existing medical record.
-     * @param medicalRecord the MedicalRecord object to update.
-     * @return the updated MedicalRecord object.
-     */
-    public MedicalRecord updateMedicalRecord(MedicalRecord medicalRecord) {
-        logger.debug("Updating medical record {}", medicalRecord);
-        return medicalRecordRepository.update((medicalRecord));
+        MedicalRecord medicalRecordToDelete = getOneMedicalRecord(firstName, lastName);
+        if (medicalRecordToDelete == null) {
+            throw new ResourceNotFoundException("No medical record for " + firstName + " " + lastName);
+        }
+        medicalRecordRepository.delete(medicalRecordToDelete);
     }
 }

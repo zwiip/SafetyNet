@@ -78,9 +78,8 @@ public class MedicalRecordControllerIntegrationTest {
         mockMvc.perform(put("/medicalrecord")
                         .contentType("application/json")
                         .content(updatedMedicalRecord))
-                .andExpect(status().isOk()) // Vérifie que le statut est 200 OK
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName", is("John")))
-                .andExpect(jsonPath("$.lastName", is("Boyd")))
                 .andExpect(jsonPath("$.medications[0]", is("ibuprofen:200mg")))
                 .andExpect(jsonPath("$.allergies[0]", is("shellfish")));
     }

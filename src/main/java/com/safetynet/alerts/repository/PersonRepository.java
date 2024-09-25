@@ -201,7 +201,7 @@ public class PersonRepository {
     }
 
     /**
-     * Delete a person matching the first name and the last name and update the JSON file.
+     * Delete the given person and update the JSON file.
      *
      * @param inputPerson a Person object to delete.
      */
@@ -215,7 +215,6 @@ public class PersonRepository {
                 return;
             }
         }
-        logger.info("{} {} deleted.", inputPerson.getFirstName(), inputPerson.getLastName());
     }
 
     /**

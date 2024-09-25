@@ -65,7 +65,7 @@ public class PersonController {
             logger.info("Successfully found {} {}", firstName, lastName);
             return ResponseEntity.ok(person);
         } catch (ResourceNotFoundException e) {
-            logger.warn(e.getMessage());
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
@@ -85,7 +85,7 @@ public class PersonController {
             logger.info("Found {} persons with the last name {}", personsWithGivenLastName.size(), last_name);
             return ResponseEntity.ok(personsWithGivenLastName);
         } catch (ResourceNotFoundException e) {
-            logger.warn(e.getMessage());
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
     }
@@ -105,10 +105,10 @@ public class PersonController {
             logger.info("Successfully created the child Alert for the address: {}. {} child and {} adults found.", address, childAlert.getChildList().size(), childAlert.getOtherMembersList().size());
             return ResponseEntity.ok(childAlert);
         } catch (ResourceNotFoundException e) {
-            logger.warn(e.getMessage());
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (EmptyResourceException e) {
-            logger.warn(e.getMessage());
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
@@ -128,7 +128,7 @@ public class PersonController {
             logger.info("Found {} emails", emailsList.size());
             return ResponseEntity.ok(emailsList);
         } catch (ResourceNotFoundException e) {
-            logger.warn(e.getMessage());
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
     }
@@ -149,7 +149,7 @@ public class PersonController {
     public ResponseEntity<Person> addOnePerson(@RequestBody Person person) {
         Person personAdded = personService.createPerson(person);
         if (Objects.isNull(personAdded)) {
-            logger.warn("Failed to add the person {}", person);
+            logger.error("Failed to add the person {} {}", person.getFirstName(), person.getLastName());
             return ResponseEntity.noContent().build();
         }
 
@@ -177,10 +177,10 @@ public class PersonController {
     public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) {
         try {
             Person personToUpdate = personService.updatePerson(person);
-            logger.info("Successfully updated the person {}", personToUpdate);
+            logger.info("Successfully updated the person {} {}", personToUpdate.getFirstName(), personToUpdate.getLastName());
             return ResponseEntity.ok(personToUpdate);
         } catch (ResourceNotFoundException e) {
-            logger.warn(e.getMessage());
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
@@ -203,8 +203,8 @@ public class PersonController {
             logger.info("Successfully deleted {} {}", first_name, last_name);
             return ResponseEntity.ok().build();
         } catch (ResourceNotFoundException e) {
-            logger.warn(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            logger.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 }

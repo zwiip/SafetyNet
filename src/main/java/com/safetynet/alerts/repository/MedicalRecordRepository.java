@@ -8,7 +8,6 @@ import com.safetynet.alerts.model.MedicalRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -124,34 +123,12 @@ public class MedicalRecordRepository {
     }
 
     /**
-     * Delete the medical record matching the given firstname and lastname.
-     *
-     * @param firstName a string representing the first name of the person we are looking for.
-     * @param lastName a string representing the last name of the person we are looking for.
-     * @throws ResourceNotFoundException if the medical record isn't found.
-     */
-    public boolean delete(String firstName, String lastName) {
-        logger.debug("Deleting medical record for {} {}", firstName, lastName);
-        for (MedicalRecord medicalRecord : medicalRecords) {
-            if(medicalRecord.getFirstName().equals(firstName) &&
-               medicalRecord.getLastName().equals(lastName)) {
-                medicalRecords.remove(medicalRecord);
-                updateMedicalRecordsList(medicalRecords);
-                logger.info("Medical record deleted successfully for {} {}", firstName, lastName);
-                return true;
-            }
-        }
-        throw new ResourceNotFoundException("It seems there is no Medical Record for: " + firstName + " " + lastName);
-    }
-
-    /**
      * Update an existing medical record with the new data and update the JSON file
      *
      * @param inputMedicalRecord a medical record with updated data
      * @return the updated medical record
-     * @throws ResourceNotFoundException if the medical record isn't found.
      */
-    public MedicalRecord update(MedicalRecord inputMedicalRecord) throws ResourceNotFoundException {
+    public MedicalRecord update(MedicalRecord inputMedicalRecord) {
         logger.debug("Updating medical record for {} {}", inputMedicalRecord.getFirstName(), inputMedicalRecord.getLastName());
         for (MedicalRecord medicalRecord : medicalRecords) {
             if(medicalRecord.getFirstName().equals(inputMedicalRecord.getFirstName()) &&
@@ -162,7 +139,25 @@ public class MedicalRecordRepository {
                 return inputMedicalRecord;
             }
         }
-        throw new ResourceNotFoundException("It seems there is no Medical Record for: " + inputMedicalRecord.getFirstName() + " " + inputMedicalRecord.getLastName());
+        return null;
+    }
+
+    /**
+     * Delete the given medical record and update the JSON file.
+     *
+     * @param inputMedicalRecord a MedicalRecord object to delete.
+     */
+    public void delete(MedicalRecord inputMedicalRecord) {
+        logger.debug("Deleting medical record for {} {}", inputMedicalRecord.getFirstName(), inputMedicalRecord.getLastName());
+        for (MedicalRecord medicalRecord : medicalRecords) {
+            if(medicalRecord.getFirstName().equals(inputMedicalRecord.getFirstName()) &&
+                    medicalRecord.getLastName().equals(inputMedicalRecord.getLastName())) {
+                medicalRecords.remove(medicalRecord);
+                updateMedicalRecordsList(medicalRecords);
+                logger.info("Medical record deleted successfully for {} {}", inputMedicalRecord.getFirstName(), inputMedicalRecord.getLastName());
+                return;
+            }
+        }
     }
 
     /**

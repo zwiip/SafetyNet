@@ -1,5 +1,6 @@
 package com.safetynet.alerts.controller;
 
+import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.service.MedicalRecordService;
 import org.slf4j.Logger;
@@ -33,7 +34,14 @@ public class MedicalRecordController {
      */
     @GetMapping("/medicalrecords")
     public List<MedicalRecord> getMedicalRecords() {
-        return medicalRecordService.getMedicalRecords(); }
+        List<MedicalRecord> medicalRecords = medicalRecordService.getMedicalRecords();
+        if (medicalRecords.isEmpty()) {
+            logger.warn("No medical records found");
+        } else {
+            logger.info("Successfully found {} medical records.", medicalRecords.size());
+        }
+        return medicalRecords;
+    }
 
     /**
      * This endpoint adds a medical record to the system.
@@ -48,7 +56,7 @@ public class MedicalRecordController {
      *     "allergies" : [ "dogs" ]
      *   }
      *
-     * @param medicalRecord a json of a medical record in the body of the resquest
+     * @param medicalRecord a json of a medical record in the body of the request
      * @return a Response Entity with the HTTP status:
      *          - 201 CREATED if the medical record has been successfully created,
      *          - 204 NO CONTENT if the medical record could not be added.
@@ -57,7 +65,7 @@ public class MedicalRecordController {
     public ResponseEntity<MedicalRecord> addMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
         MedicalRecord medicalRecordToAdd = medicalRecordService.createMedicalRecord(medicalRecord);
         if (Objects.isNull(medicalRecordToAdd)) {
-            logger.warn("Failed to add the medical record {}", medicalRecord);
+            logger.error("Failed to add the medical record for {} {}", medicalRecord.getFirstName(), medicalRecord.getLastName());
             return ResponseEntity.noContent().build();
         }
         URI location = ServletUriComponentsBuilder
@@ -88,11 +96,14 @@ public class MedicalRecordController {
      */
     @PutMapping(value = "/medicalrecord")
     public ResponseEntity<MedicalRecord> updateMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
-        MedicalRecord medicalRecordToUpdate = medicalRecordService.updateMedicalRecord(medicalRecord);
-        if (Objects.isNull(medicalRecordToUpdate)) {
+        try {
+            MedicalRecord medicalRecordToUpdate = medicalRecordService.updateMedicalRecord(medicalRecord);
+            logger.info("Successfully updated the medical record for {} {}.", medicalRecordToUpdate.getFirstName(), medicalRecordToUpdate.getLastName());
+            return ResponseEntity.ok(medicalRecordToUpdate);
+        } catch (ResourceNotFoundException e) {
+            logger.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(medicalRecordToUpdate);
     }
 
     /**
@@ -109,11 +120,13 @@ public class MedicalRecordController {
     @DeleteMapping(value = "/medicalrecord")
     public ResponseEntity<Void> deleteMedicalRecord(@RequestParam String first_name, @RequestParam String last_name) {
         logger.debug("Received request to delete the Medical Record for {} {}", first_name, last_name);
-        if (!medicalRecordService.deleteMedicalRecord(first_name, last_name)) {
-            logger.warn("Failed to delete the Medical Record for {} {}", first_name, last_name);
+        try {
+            medicalRecordService.deleteMedicalRecord(first_name, last_name);
+            logger.info("Successfully deleted the Medical Record for {} {}", first_name, last_name);
+            return ResponseEntity.ok().build();
+        } catch (ResourceNotFoundException e) {
+            logger.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
-        logger.info("Successfully deleted the Medical Record for {} {}", first_name, last_name);
-        return ResponseEntity.ok().build();
     }
 }

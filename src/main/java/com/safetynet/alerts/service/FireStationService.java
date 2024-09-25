@@ -1,10 +1,9 @@
 package com.safetynet.alerts.service;
 
 import com.safetynet.alerts.controller.dto.*;
-import com.safetynet.alerts.exceptions.EmptyResourceException;
 import com.safetynet.alerts.exceptions.ResourceAlreadyExistException;
+import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.FireStation;
-import com.safetynet.alerts.model.MedicalRecord;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.FireStationRepository;
 import org.slf4j.Logger;
@@ -41,14 +40,10 @@ public class FireStationService {
      * Retrieves the list of all fire stations.
      *
      * @return a list of FireStation objects.
-     * @throws EmptyResourceException if the fire station list is empty.
      */
     public List<FireStation> getFireStations() {
         logger.debug("retrieving all fire stations");
         List<FireStation> fireStations = fireStationRepository.findAll();
-        if (fireStations.isEmpty()) {
-            throw new EmptyResourceException("No fire stations found");
-        }
         logger.debug("Retrieved {} fire stations", fireStations.size());
         return fireStations;
     }
@@ -58,14 +53,18 @@ public class FireStationService {
      *
      * @param stationNumber the String of the fire station's number.
      * @return a CoveredPersonsListDTO object containing adults and children counts and person details.
-     *
+     * @throws ResourceNotFoundException if no addresses are recorded for the given station number.
      */
     public CoveredPersonsListDTO createFireStationPersonsList(String stationNumber) {
         logger.debug("Creating list of persons covered by fire station {}", stationNumber);
         int childCounter = 0;
         int adultsCounter = 0;
         ArrayList<PersonDTO> fireStationPersonsList = new ArrayList<>();
-        for (String address : fireStationRepository.getCoveredAddresses(stationNumber)) {
+        List<String> coveredAddresses = fireStationRepository.getCoveredAddresses(stationNumber);
+        if (coveredAddresses.isEmpty()) {
+            throw new ResourceNotFoundException("No addresses recorded for the station number: " + stationNumber);
+        }
+        for (String address : coveredAddresses) {
             for (Person person : personService.getPersons())  {
                 if (person.getAddress().equals(address)) {
                     if (medicalRecordService.isChild(person.getFirstName(), person.getLastName())) {
@@ -86,11 +85,16 @@ public class FireStationService {
      *
      * @param firestationNumber the number of the fire station.
      * @return a set of phone numbers to avoid duplicates.
+     * @throws ResourceNotFoundException if no addresses are recorded for the given station number.
      */
     public Set<String> createPhoneList(String firestationNumber) {
         logger.debug("Creating phone list for fire station {}, which covers {} addresses", firestationNumber, fireStationRepository.getCoveredAddresses(firestationNumber));
         Set<String> phoneList = new HashSet<>();
-        for (String address : fireStationRepository.getCoveredAddresses(firestationNumber)) {
+        List<String> coveredAddresses = fireStationRepository.getCoveredAddresses(firestationNumber);
+        if (coveredAddresses.isEmpty()) {
+            throw new ResourceNotFoundException("No addresses recorded for the station number: " + firestationNumber);
+        }
+        for (String address : coveredAddresses) {
             logger.debug("Processing address: {}", address);
             for (Person person : personService.getPersons())  {
                 if (person.getAddress().equals(address)) {
@@ -98,9 +102,6 @@ public class FireStationService {
                     logger.debug("Adding number of {} : {} ", person.getFirstName(), person.getPhone());
                 }
             }
-        }
-        if (phoneList.isEmpty()) {
-            throw new EmptyResourceException("No phones found for fire station " + firestationNumber);
         }
         logger.debug("Fire station {} covers {} phone", firestationNumber, phoneList.size());
         return phoneList;
@@ -111,11 +112,15 @@ public class FireStationService {
      *
      * @param address a String representing the address to check.
      * @return a PersonsListInCaseOfFireDTO object containing station number and persons details.
+     * @throws ResourceNotFoundException if no data is found for this address.
      */
     public PersonsListInCaseOfFireDTO createPersonsListInCaseOfFire(String address) {
         logger.debug("Creating list of persons at the address {}", address);
         String stationNumber = fireStationRepository.getStationNumber(address);
-        ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = createPersonsAtThisAddressList(address);
+        if (stationNumber == null) {
+            throw new ResourceNotFoundException("No data for this address: " + address);
+        }
+        ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = personService.createPersonsAtThisAddressList(address);
         logger.info("A list of {} persons at the address {} in case of fire, covered by fire station {} has been created", personsAtThisAddressList.size(), address, stationNumber);
         return new PersonsListInCaseOfFireDTO(stationNumber, personsAtThisAddressList);
     }
@@ -131,25 +136,15 @@ public class FireStationService {
         List<FloodAlertDTO> floodAlertList = new ArrayList<>();
         for (String station : stations) {
             for (String address : fireStationRepository.getCoveredAddresses(station)) {
-                ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = createPersonsAtThisAddressList(address);
+                ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = personService.createPersonsAtThisAddressList(address);
                 floodAlertList.add(new FloodAlertDTO(address, personsAtThisAddressList));
+            }
+            if (floodAlertList.isEmpty()) {
+                logger.warn("No addresses found for the station {}.", station);
             }
         }
         logger.info("Flood alert list created for stations {}, with {} addresses covered", stations, floodAlertList.size());
         return floodAlertList;
-    }
-
-    public ArrayList<PersonAtThisAddressDTO> createPersonsAtThisAddressList(String address) {
-        logger.debug("Creating persons list at the address {}", address);
-        ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
-        for ( Person person : personService.getPersonsByAddress(address)) {
-            long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
-            MedicalRecord medicalRecord = medicalRecordService.getOneMedicalRecord(person.getFirstName(), person.getLastName());
-            MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
-            personsAtThisAddressList.add(new PersonAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
-        }
-        logger.debug("Persons list created for address {}", address);
-        return personsAtThisAddressList;
     }
 
     /**
@@ -157,26 +152,15 @@ public class FireStationService {
      *
      * @param fireStation the FireStation object to create.
      * @return the created FireStation object.
+     * @throws ResourceAlreadyExistException if the firestation address is already in the list
      */
     public FireStation createFireStation(FireStation fireStation) throws ResourceAlreadyExistException {
         logger.debug("adding new fire station {}", fireStation);
-        String address = fireStation.getAddress();
-        for (FireStation station : getFireStations()) {
-            if (station.getAddress().equals(address)) {
-                throw new ResourceAlreadyExistException("This address already exist with station number " + fireStation.getStation() + ". If you want to change it, please use an update operation.");
-            }
+        FireStation fireStationToUpdate = fireStationRepository.getFireStationByAddress(fireStation.getAddress());
+        if (fireStationToUpdate != null ) {
+            throw new ResourceAlreadyExistException("This address already exist with station number " + fireStation.getStation() + ". If you want to change it, please use an update operation.");
         }
         return fireStationRepository.save(fireStation);
-    }
-
-    /**
-     * Deletes a fire station by its address.
-     *
-     * @param address a string representing the address of the fire station to delete.
-     */
-    public boolean deleteFireStation(String address) {
-        logger.debug("Deleting fire station at the address: {}", address);
-        return fireStationRepository.delete(address);
     }
 
     /**
@@ -184,9 +168,29 @@ public class FireStationService {
      *
      * @param fireStation the FireStation object to update.
      * @return the updated FireStation object.
+     * @throws ResourceNotFoundException if the given fire station is not found in the firestations list.
      */
-    public FireStation updateFireStation(FireStation fireStation) {
+    public FireStation updateFireStation(FireStation fireStation) throws ResourceNotFoundException {
         logger.info("Updating fire station at address {}", fireStation.getAddress());
+        FireStation fireStationToUpdate = fireStationRepository.getFireStationByAddress(fireStation.getAddress());
+        if (fireStationToUpdate == null) {
+            throw new ResourceNotFoundException("No fire station for the address: " + fireStation.getAddress());
+        }
         return fireStationRepository.update(fireStation);
     }
+
+    /**
+     * Deletes a fire station by its address.
+     *
+     * @param address a string representing the address of the fire station to delete.
+     */
+    public void deleteFireStation(String address) throws ResourceNotFoundException {
+        logger.debug("Deleting fire station at the address: {}", address);
+        FireStation fireStationToDelete = fireStationRepository.getFireStationByAddress(address);
+        if (fireStationToDelete == null) {
+            throw new ResourceNotFoundException("No data in the fire stations list for the address: " + address);
+        }
+        fireStationRepository.delete(fireStationToDelete.getAddress());
+    }
+
 }

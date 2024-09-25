@@ -1,9 +1,6 @@
 package com.safetynet.alerts.service;
 
-import com.safetynet.alerts.controller.dto.ChildAlertDTO;
-import com.safetynet.alerts.controller.dto.FullNameAndAgeDTO;
-import com.safetynet.alerts.controller.dto.MedicalRecordDTO;
-import com.safetynet.alerts.controller.dto.PersonInfoLastNameDTO;
+import com.safetynet.alerts.controller.dto.*;
 import com.safetynet.alerts.exceptions.EmptyResourceException;
 import com.safetynet.alerts.exceptions.ResourceAlreadyExistException;
 import com.safetynet.alerts.exceptions.ResourceNotFoundException;
@@ -37,7 +34,6 @@ public class PersonService {
      * Retrieves the list of all persons.
      *
      * @return a list of Person objects.
-     * @throws EmptyResourceException if the list of person is empty.
      */
     public List<Person> getPersons() {
         logger.debug("Retrieving all persons");
@@ -157,6 +153,29 @@ public class PersonService {
         }
         logger.info("Created a list of {} emails for the city: {}", emails.size(), city);
         return emails;
+    }
+
+    /**
+     * Create a List of persons living at the given address.
+     *
+     * @param address a String representing the address.
+     * @return a list of Person objects.
+     * @throws ResourceNotFoundException if the address is not found or nobody lives there.
+     */
+    public ArrayList<PersonAtThisAddressDTO> createPersonsAtThisAddressList(String address) {
+        logger.debug("Creating persons list at the address {}", address);
+        ArrayList<PersonAtThisAddressDTO> personsAtThisAddressList = new ArrayList<>();
+        for ( Person person : getPersonsByAddress(address)) {
+            long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
+            MedicalRecord medicalRecord = medicalRecordService.getOneMedicalRecord(person.getFirstName(), person.getLastName());
+            MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
+            personsAtThisAddressList.add(new PersonAtThisAddressDTO(person.getLastName(), person.getPhone(), age, medicalRecordDTO));
+        }
+        if (personsAtThisAddressList.isEmpty()) {
+            throw new ResourceNotFoundException("Address not found or nobody lives there: " + address);
+        }
+        logger.debug("Persons list created for address {}", address);
+        return personsAtThisAddressList;
     }
 
     /**

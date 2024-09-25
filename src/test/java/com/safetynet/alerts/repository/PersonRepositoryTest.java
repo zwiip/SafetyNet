@@ -31,7 +31,7 @@ public class PersonRepositoryTest {
         repository = new PersonRepository(dataRepositoryMock);
         JsonNode personsNode = jsonNode.get("persons");
 
-        TypeReference<List<Person>> typeReferenceList = new TypeReference<List<Person>>() {};
+        TypeReference<List<Person>> typeReferenceList = new TypeReference<>() {};
         repository.persons = objectMapper.readValue(personsNode.traverse(), typeReferenceList);
     }
 
@@ -73,7 +73,7 @@ public class PersonRepositoryTest {
 
         // Assert
         assertEquals(2, wantedPersonsList.size());
-        assertEquals("Marilla", wantedPersonsList.get(0).getFirstName());
+        assertEquals("Marilla", wantedPersonsList.getFirst().getFirstName());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class PersonRepositoryTest {
 
         // Assert
         assertEquals(3, wantedPersonsList.size());
-        assertEquals("Anne", wantedPersonsList.get(0).getFirstName());
+        assertEquals("Anne", wantedPersonsList.getFirst().getFirstName());
     }
 
     @Test
@@ -93,11 +93,11 @@ public class PersonRepositoryTest {
 
         // Assert
         assertEquals(4, wantedPersonsList.size());
-        assertEquals("Anne", wantedPersonsList.get(0).getFirstName());
+        assertEquals("Anne", wantedPersonsList.getFirst().getFirstName());
     }
 
     @Test
-    void save_shouldAddPersonToRepository() throws IOException {
+    void save_shouldAddPersonToRepository() {
         // Arrange
         Person newPerson = new Person("Gilbert", "Blythe", "Old Farm", "Avonlea", "12345", "1598476321", "gilbert.blythe@avonlea.com");
 
@@ -110,7 +110,7 @@ public class PersonRepositoryTest {
     }
 
     @Test
-    void delete_shouldRemovePersonFromRepository() throws IOException {
+    void delete_shouldRemovePersonFromRepository() {
         // Arrange
         Person personToDelete = new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com");
 
@@ -123,7 +123,7 @@ public class PersonRepositoryTest {
     }
 
     @Test
-    void update_shouldModifyExistingPerson() throws IOException {
+    void update_shouldModifyExistingPerson() {
         // Arrange
         Person updatedPerson = new Person("Anne", "Shirley", "Patty's House", "Redmond", "74185", "0123456789", "anne.shirley@avonlea.com");
 
@@ -133,7 +133,7 @@ public class PersonRepositoryTest {
         // Assert
         assertTrue(repository.persons.contains(updatedPerson));
         assertEquals(5, repository.persons.size());
-        assertEquals("Patty's House", repository.persons.get(0).getAddress());
-        assertEquals("Redmond", repository.persons.get(0).getCity());
+        assertEquals("Patty's House", repository.persons.getFirst().getAddress());
+        assertEquals("Redmond", repository.persons.getFirst().getCity());
     }
 }

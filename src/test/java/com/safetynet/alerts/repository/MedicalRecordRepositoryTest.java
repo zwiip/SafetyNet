@@ -85,7 +85,7 @@ public class MedicalRecordRepositoryTest {
         MedicalRecord medicalRecordToDelete = new MedicalRecord("Anne", "Shirley", "01/02/2010", new ArrayList<>(List.of("")), new ArrayList<>(List.of("")));
 
         // Act
-        repository.delete("Anne", "Shirley");
+        repository.delete(medicalRecordToDelete);
 
         // Assert
         assertFalse(repository.medicalRecords.contains(medicalRecordToDelete));
