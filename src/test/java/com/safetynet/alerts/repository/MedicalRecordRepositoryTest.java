@@ -32,7 +32,7 @@ public class MedicalRecordRepositoryTest {
         repository = new MedicalRecordRepository(dataRepositoryMock);
         JsonNode medicalRecordsNode = jsonNode.get("medicalrecords");
 
-        TypeReference<List<MedicalRecord>> typeReferenceList = new TypeReference<List<MedicalRecord>>() {};
+        TypeReference<List<MedicalRecord>> typeReferenceList = new TypeReference<>() {};
         repository.medicalRecords = objectMapper.readValue(medicalRecordsNode.traverse(), typeReferenceList);
     }
 
@@ -67,7 +67,7 @@ public class MedicalRecordRepositoryTest {
     }
 
     @Test
-    void save_shouldAddMedicalRecordToRepository() throws IOException {
+    void save_shouldAddMedicalRecordToRepository() {
         // Arrange
         MedicalRecord newMedicalRecord = new MedicalRecord("Gilbert", "Blythe", "05/09/2010", new ArrayList<>(List.of("")), new ArrayList<>(List.of("")));
 
@@ -80,7 +80,7 @@ public class MedicalRecordRepositoryTest {
     }
 
     @Test
-    void delete_shouldRemoveMedicalRecordFromRepository() throws IOException {
+    void delete_shouldRemoveMedicalRecordFromRepository() {
         // Arrange
         MedicalRecord medicalRecordToDelete = new MedicalRecord("Anne", "Shirley", "01/02/2010", new ArrayList<>(List.of("")), new ArrayList<>(List.of("")));
 
@@ -93,7 +93,7 @@ public class MedicalRecordRepositoryTest {
     }
 
     @Test
-    void update_shouldModifyExistingMedicalRecord() throws IOException {
+    void update_shouldModifyExistingMedicalRecord() {
         // Arrange
         MedicalRecord medicalRecordToUpdate = new MedicalRecord("Anne", "Shirley", "01/02/2000", new ArrayList<>(List.of("")), new ArrayList<>(List.of("")));
 
@@ -103,6 +103,6 @@ public class MedicalRecordRepositoryTest {
         // Assert
         assertTrue(repository.medicalRecords.contains(medicalRecordToUpdate));
         assertEquals(5, repository.medicalRecords.size());
-        assertEquals("01/02/2000", repository.medicalRecords.get(0).getBirthdate());
+        assertEquals("01/02/2000", repository.medicalRecords.getFirst().getBirthdate());
     }
 }
