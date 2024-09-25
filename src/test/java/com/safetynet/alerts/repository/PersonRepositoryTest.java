@@ -115,7 +115,7 @@ public class PersonRepositoryTest {
         Person personToDelete = new Person("Anne", "Shirley", "Green Gables", "Avonlea", "12345", "0123456789", "anne.shirley@avonlea.com");
 
         // Act
-        repository.delete("Anne", "Shirley");
+        repository.delete(personToDelete);
 
         // Assert
         assertFalse(repository.persons.contains(personToDelete));

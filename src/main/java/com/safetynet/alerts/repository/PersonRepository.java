@@ -49,7 +49,7 @@ public class PersonRepository {
 
             this.persons = validatePersonsData(personsData);
             updatePersonsList(this.persons);
-            logger.debug("Persons list created, with {} persons.", persons.size());
+            logger.info("Persons list created, with {} persons.", persons.size());
         } catch (IOException e) {
             throw new RuntimeException("Error while creating Persons List", e);
         }
@@ -76,7 +76,7 @@ public class PersonRepository {
                 logger.warn("Duplicate person found and removed: {}", fullName);
             }
         }
-        logger.debug("Validation complete. Total persons after removing duplicates: {}", filteredPersons.size());
+        logger.info("Validation complete. Total persons after removing duplicates: {}", filteredPersons.size());
         return filteredPersons;
     }
 
@@ -203,13 +203,19 @@ public class PersonRepository {
     /**
      * Delete a person matching the first name and the last name and update the JSON file.
      *
-     * @param person a Person object to delete.
+     * @param inputPerson a Person object to delete.
      */
-    public void delete(Person person) {
-        logger.debug("Deleting person named {} {}.", person.getFirstName(), person.getLastName());
-        persons.remove(person);
-        updatePersonsList(persons);
-        logger.info("{} {} deleted.", person.getFirstName(), person.getLastName());
+    public void delete(Person inputPerson) {
+        logger.debug("Deleting person named {} {}.", inputPerson.getFirstName(), inputPerson.getLastName());
+        for (Person person : persons) {
+            if (person.getFirstName().equals(inputPerson.getFirstName()) && person.getLastName().equals(inputPerson.getLastName())) {
+                persons.remove(person);
+                updatePersonsList(persons);
+                logger.info("{} {} deleted.", person.getFirstName(), person.getLastName());
+                return;
+            }
+        }
+        logger.info("{} {} deleted.", inputPerson.getFirstName(), inputPerson.getLastName());
     }
 
     /**
