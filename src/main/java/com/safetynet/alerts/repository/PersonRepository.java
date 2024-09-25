@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.safetynet.alerts.exceptions.ResourceNotFoundException;
+
 import com.safetynet.alerts.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,32 +181,10 @@ public class PersonRepository {
     }
 
     /**
-     * Delete a person matching the first name and the last name and update the JSON file.
-     *
-     * @param firstName a String representing the first name of the person we want to delete.
-     * @param lastName a String representing the last name of the person we want to delete.
-     * @throws IllegalArgumentException if no person matching the inputs is found.
-     */
-    public boolean delete(String firstName, String lastName) throws ResourceNotFoundException {
-        logger.debug("Deleting person named {} {}.", firstName, lastName);
-        for (Person person : persons) {
-            if(person.getFirstName().equals(firstName) &&
-               person.getLastName().equals(lastName)) {
-                persons.remove(person);
-                updatePersonsList(persons);
-                logger.info("{} {} deleted.", person.getFirstName(), person.getLastName());
-                return true;
-            }
-        }
-        throw new ResourceNotFoundException("Person not found: " + firstName + " " + lastName);
-    }
-
-    /**
      * Update an existing person with the new data and update the JSON file.
      *
      * @param inputPerson a person with updated data.
-     * @return the updated person
-     * @throws  IllegalArgumentException if no person is found with the input.
+     * @return the updated person.
      */
     public Person update(Person inputPerson) {
         logger.debug("Updating person {} {}.", inputPerson.getFirstName(), inputPerson.getLastName());
@@ -219,7 +197,19 @@ public class PersonRepository {
                 return inputPerson;
             }
         }
-        throw new ResourceNotFoundException("Person not found: " + inputPerson.getFirstName() + " " + inputPerson.getLastName());
+        return null;
+    }
+
+    /**
+     * Delete a person matching the first name and the last name and update the JSON file.
+     *
+     * @param person a Person object to delete.
+     */
+    public void delete(Person person) {
+        logger.debug("Deleting person named {} {}.", person.getFirstName(), person.getLastName());
+        persons.remove(person);
+        updatePersonsList(persons);
+        logger.info("{} {} deleted.", person.getFirstName(), person.getLastName());
     }
 
     /**

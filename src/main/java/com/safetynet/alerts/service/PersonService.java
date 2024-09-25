@@ -42,9 +42,6 @@ public class PersonService {
     public List<Person> getPersons() {
         logger.debug("Retrieving all persons");
         List<Person> persons = personRepository.findAll();
-        if (persons.isEmpty()) {
-            throw new EmptyResourceException("Nobody found");
-        }
         logger.debug("Found {} persons", persons.size());
         return persons;
     }
@@ -59,7 +56,7 @@ public class PersonService {
      */
     public Person getOnePerson(String firstName, String lastName) throws ResourceNotFoundException {
         logger.debug("Retrieving {} {}", firstName, lastName);
-        Person person =personRepository.findPersonByFullName(firstName, lastName);
+        Person person = personRepository.findPersonByFullName(firstName, lastName);
         if (person == null) {
             throw new ResourceNotFoundException("No person named " + firstName + " " + lastName + " found.");
         }
@@ -72,20 +69,24 @@ public class PersonService {
      *
      * @param lastName a String representing the last name of the persons we are looking for.
      * @return a List of PersonInfoLastNameDTO object containing the details and medical record of each person matching the name.
-     * @throws EmptyResourceException if nobody is matching the name and the list is empty.
+     * @throws ResourceNotFoundException if nobody is matching the name and the list is empty.
      */
     public List<PersonInfoLastNameDTO> getPersonsByLastName(String lastName) throws EmptyResourceException {
         logger.debug("Retrieving persons by last name: {}", lastName);
         List<PersonInfoLastNameDTO> personInfoLastNameDTOList = new ArrayList<>();
-        for (Person person : personRepository.findPersonsByLastName(lastName)) {
+
+        List<Person> personsWithThisLastName = personRepository.findPersonsByLastName(lastName);
+        if (personsWithThisLastName.isEmpty()) {
+            throw new ResourceNotFoundException("No persons matching " + lastName + " found.");
+        }
+
+        for (Person person : personsWithThisLastName) {
             long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
             MedicalRecord medicalRecord = medicalRecordService.getOneMedicalRecord(person.getFirstName(), person.getLastName());
             MedicalRecordDTO medicalRecordDTO = (new MedicalRecordDTO(medicalRecord.getMedications(), medicalRecord.getAllergies()));
             personInfoLastNameDTOList.add(new PersonInfoLastNameDTO(person.getLastName(), person.getAddress(), age, person.getEmail(), medicalRecordDTO));
         }
-        if (personInfoLastNameDTOList.isEmpty()) {
-            throw new EmptyResourceException("Nobody found matching the last name: " + lastName);
-        }
+
         logger.info("Created a list of {} persons matching the name {}", personInfoLastNameDTOList.size(), lastName);
         return personInfoLastNameDTOList;
     }
@@ -95,13 +96,13 @@ public class PersonService {
      *
      * @param address a String representing the address.
      * @return a List of Person objects living at the given address.
-     * @throws EmptyResourceException if nobody lives at the input address.
+     * @throws ResourceNotFoundException if the address is not found or nobody lives there.
      */
     public List<Person> getPersonsByAddress(String address) throws EmptyResourceException {
         logger.debug("Retrieving a list of persons by address: {}", address);
         List<Person> personsAtThisAddress = personRepository.findPersonByAddress(address);
         if (personsAtThisAddress.isEmpty()) {
-            throw new EmptyResourceException("Nobody found living at the address: " + address);
+            throw new ResourceNotFoundException("The address is not found or nobody is living there: " + address);
         }
         return personsAtThisAddress;
     }
@@ -111,16 +112,20 @@ public class PersonService {
      *
      * @param address a String representing the address.
      * @return a ChildAlertDTO object containing the lists of FullNameAndAgeDTO for child and adults.
+     * @throws ResourceNotFoundException if the address is not found or nobody lives there.
+     * @throws EmptyResourceException if no children lives at the given address.
      */
     public ChildAlertDTO createChildAlertList(String address) throws EmptyResourceException{
         logger.debug("Creating a child alert list at this address: {}", address);
         ArrayList<FullNameAndAgeDTO> adultsList = new ArrayList<>();
         ArrayList<FullNameAndAgeDTO> childrenList = new ArrayList<>();
-        List<Person> persons = getPersonsByAddress(address);
-        if (persons.isEmpty()) {
-            throw new EmptyResourceException("Nobody is recorded at this address, please check your input: " + address);
+        List<Person> personsAtThisAddress = getPersonsByAddress(address);
+
+        if (personsAtThisAddress.isEmpty()) {
+            throw new ResourceNotFoundException("Nobody is recorded at this address, please check your input: " + address);
         }
-        for (Person person : getPersonsByAddress(address)) {
+
+        for (Person person : personsAtThisAddress) {
             long age = medicalRecordService.getAge(person.getFirstName(), person.getLastName());
             if (age <= 18) {
                 childrenList.add(new FullNameAndAgeDTO(person.getFirstName(), person.getLastName(), age));
@@ -129,8 +134,9 @@ public class PersonService {
             }
         }
             if (childrenList.isEmpty()) {
-                logger.warn("No child is living here");
+                throw new EmptyResourceException("No child is living here");
             }
+
             logger.info("Created a child alert with {} child and {} adults living at this address: {}", childrenList.size(), adultsList.size(), address);
             return new ChildAlertDTO(childrenList, adultsList);
     }
@@ -173,24 +179,35 @@ public class PersonService {
     }
 
     /**
+     * Updates an existing person.
+     *
+     * @param inputPerson a Person object to update.
+     * @return the updated Person.
+     * @throws ResourceNotFoundException if the inputPerson is not found in the persons list.
+     */
+    public Person updatePerson(Person inputPerson) throws ResourceNotFoundException {
+        logger.debug("Updating person: {} {}", inputPerson.getFirstName(), inputPerson.getLastName());
+        Person personToUpdate = personRepository.findPersonByFullName(inputPerson.getFirstName(), inputPerson.getLastName());
+        if (personToUpdate == null) {
+            throw new ResourceNotFoundException("No person named " + inputPerson.getFirstName() + " " + inputPerson.getLastName() + " found.");
+        }
+        return personRepository.update(inputPerson);
+    }
+
+    /**
      * Deletes a Person matching the given inputs.
      *
      * @param firstName a String representing the first name of the person to delete.
      * @param lastName a String representing the last name of the person to delete.
+     * @throws ResourceNotFoundException if the person is not found in the persons list.
      */
-    public boolean deleteOnePerson(String firstName, String lastName) {
+    public void deleteOnePerson(String firstName, String lastName) {
         logger.debug("Deleting {} {}", firstName, lastName);
-        return personRepository.delete(firstName, lastName);
+        Person person = personRepository.findPersonByFullName(firstName, lastName);
+        if (person == null) {
+            throw new ResourceNotFoundException("No person named " + firstName + " " + lastName + " found.");
+        }
+        personRepository.delete(person);
     }
 
-    /**
-     * Updates an existing person.
-     *
-     * @param person a Person object to update.
-     * @return the updated Person.
-     */
-    public Person updatePerson(Person person) {
-        logger.debug("Updating person: {} {}", person.getFirstName(), person.getLastName());
-        return personRepository.update(person);
-    }
 }

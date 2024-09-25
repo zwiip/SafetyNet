@@ -2,15 +2,19 @@ package com.safetynet.alerts.controller;
 
 import com.safetynet.alerts.controller.dto.ChildAlertDTO;
 import com.safetynet.alerts.controller.dto.PersonInfoLastNameDTO;
+import com.safetynet.alerts.exceptions.EmptyResourceException;
+import com.safetynet.alerts.exceptions.ResourceNotFoundException;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.service.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,32 +59,15 @@ public class PersonController {
      * @return a Person object matching the inputs.
      */
     @GetMapping("/person/{first_name}/{last_name}")
-    public Person getOnePerson(@PathVariable("first_name") String firstName, @PathVariable("last_name") String lastName) {
-        Person person = personService.getOnePerson(firstName, lastName);
-        if (person == null) {
-            logger.warn("Nobody seems to match : {} {}", firstName, lastName);
-        } else {
+    public ResponseEntity<Person> getOnePerson(@PathVariable("first_name") String firstName, @PathVariable("last_name") String lastName) {
+        try {
+            Person person = personService.getOnePerson(firstName, lastName);
             logger.info("Successfully found {} {}", firstName, lastName);
+            return ResponseEntity.ok(person);
+        } catch (ResourceNotFoundException e) {
+            logger.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return person;
-    }
-
-    /**
-     * This endpoint returns a list of child and adults and their details at a given address.
-     * Example usage:
-     * GET /childAlert?address=221B Baker Street
-     *
-     * @param address a String representing.
-     * @return a ChildAlertDTO object containing a list of child and a list of other members of the family living at the given address.
-     */
-    @GetMapping("/childAlert")
-    public ChildAlertDTO getChildAlertList(@RequestParam String address) {
-        ChildAlertDTO childAlert = personService.createChildAlertList(address);
-        if (childAlert == null) {
-            logger.warn("Problem creating a child alert, please check the address: {}", address);
-        }
-        logger.info("Successfully created the child Alert for the address: {}", address);
-        return childAlert;
     }
 
     /**
@@ -92,8 +79,38 @@ public class PersonController {
      * @return a list of PersonInfoLastNameDTO objects containing the list of the persons and their details.
      */
     @GetMapping("/personInfo")
-        public List<PersonInfoLastNameDTO> getPersonInfoLastName(@RequestParam String last_name) {
-        return personService.getPersonsByLastName(last_name);
+    public ResponseEntity<List<PersonInfoLastNameDTO>> getPersonInfoLastName(@RequestParam String last_name) {
+        try {
+            List<PersonInfoLastNameDTO> personsWithGivenLastName = personService.getPersonsByLastName(last_name);
+            logger.info("Found {} persons with the last name {}", personsWithGivenLastName.size(), last_name);
+            return ResponseEntity.ok(personsWithGivenLastName);
+        } catch (ResourceNotFoundException e) {
+            logger.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+        }
+    }
+
+    /**
+     * This endpoint returns a list of child and adults and their details at a given address.
+     * Example usage:
+     * GET /childAlert?address=221B Baker Street
+     *
+     * @param address a String representing.
+     * @return a ChildAlertDTO object containing a list of child and a list of other members of the family living at the given address.
+     */
+    @GetMapping("/childAlert")
+    public ResponseEntity<ChildAlertDTO> getChildAlertList(@RequestParam String address) {
+        try {
+            ChildAlertDTO childAlert = personService.createChildAlertList(address);
+            logger.info("Successfully created the child Alert for the address: {}. {} child and {} adults found.", address, childAlert.getChildList().size(), childAlert.getOtherMembersList().size());
+            return ResponseEntity.ok(childAlert);
+        } catch (ResourceNotFoundException e) {
+            logger.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (EmptyResourceException e) {
+            logger.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     /**
@@ -105,8 +122,15 @@ public class PersonController {
      * @return a list of String representing emails.
      */
     @GetMapping("/communityEmail")
-    public List<String> getCommunityEmail(@RequestParam String city) {
-        return personService.getPersonsEmails(city);
+    public ResponseEntity<List<String>> getCommunityEmail(@RequestParam String city) {
+        try {
+            List<String> emailsList = personService.getPersonsEmails(city);
+            logger.info("Found {} emails", emailsList.size());
+            return ResponseEntity.ok(emailsList);
+        } catch (ResourceNotFoundException e) {
+            logger.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+        }
     }
 
     /**
@@ -151,11 +175,14 @@ public class PersonController {
      */
     @PutMapping(value="/person")
     public ResponseEntity<Person> updateOnePerson(@RequestBody Person person) {
-        Person personToUpdate = personService.updatePerson(person);
-        if (Objects.isNull(personToUpdate)) {
-            return ResponseEntity.notFound().build();
+        try {
+            Person personToUpdate = personService.updatePerson(person);
+            logger.info("Successfully updated the person {}", personToUpdate);
+            return ResponseEntity.ok(personToUpdate);
+        } catch (ResourceNotFoundException e) {
+            logger.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return ResponseEntity.ok(personToUpdate);
     }
 
     /**
@@ -171,11 +198,13 @@ public class PersonController {
      */
     @DeleteMapping(value="/person")
     public ResponseEntity<Void> deleteOnePerson(@RequestParam String first_name, @RequestParam String last_name) {
-        if (!personService.deleteOnePerson(first_name, last_name)) {
-            logger.warn("Failed to delete {} {}", first_name, last_name);
-            return ResponseEntity.notFound().build();
+        try {
+            personService.deleteOnePerson(first_name, last_name);
+            logger.info("Successfully deleted {} {}", first_name, last_name);
+            return ResponseEntity.ok().build();
+        } catch (ResourceNotFoundException e) {
+            logger.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        logger.info("Successfully deleted {} {}", first_name, last_name);
-        return ResponseEntity.ok().build();
     }
 }
