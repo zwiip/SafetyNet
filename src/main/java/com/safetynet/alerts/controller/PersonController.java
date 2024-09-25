@@ -73,7 +73,7 @@ public class PersonController {
     /**
      * This endpoint returns a list of persons that have the given last name, and their details.
      * Example usage:
-     * GET /personInfolastName?last_name=Doyle
+     * GET /personInfo?last_name=Doyle
      *
      * @param last_name a String representing the last name.
      * @return a list of PersonInfoLastNameDTO objects containing the list of the persons and their details.

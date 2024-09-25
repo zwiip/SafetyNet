@@ -48,13 +48,7 @@ public class MedicalRecordController {
      * It takes a json of a medical record in the body.
      * Example usage:
      * POST /medicalrecord
-     * Body: {
-     *     "firstName" : "Jane",
-     *     "lastName" : "Eyre",
-     *     "birthdate" : "03/06/1984",
-     *     "medications" : [ "vitamins" ],
-     *     "allergies" : [ "dogs" ]
-     *   }
+     * Body: {"firstName" : "Jane", "lastName" : "Eyre", "birthdate" : "03/06/1984", "medications" : [ "vitamins" ], "allergies" : [ "dogs" ]}
      *
      * @param medicalRecord a json of a medical record in the body of the request
      * @return a Response Entity with the HTTP status:
@@ -81,13 +75,7 @@ public class MedicalRecordController {
      * Update an existing medicalRecord from the system with new details.
      * Example usage:
      * PUT /medicalrecord
-     * Body: Body: {
-     *      *     "firstName" : "Jane",
-     *      *     "lastName" : "Eyre",
-     *      *     "birthdate" : "03/06/1984",
-     *      *     "medications" : [ "doliprane:500gr" ],
-     *      *     "allergies" : [ "cats" ]
-     *      *   }
+     * Body: {"firstName" : "Jane", "lastName" : "Eyre", "birthdate" : "03/06/1984", "medications" : [ "doliprane:500gr" ], "allergies" : [ "cats" ]}
      *
      * @param medicalRecord a json of a medical record in the body of the request.
      * @return a Response Entity with the updated medical record and the HTTP status:
